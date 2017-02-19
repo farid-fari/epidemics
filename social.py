@@ -152,3 +152,4 @@ class Network:
                 i][j]} for j, other in enumerate(self.players)])
         for i, player in enumerate(self.players):
             player.optimize(curstate[i], self.isolationutility, self.qualities)
+            
