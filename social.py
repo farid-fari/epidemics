@@ -71,6 +71,9 @@ class Network:
                         self.graph[i][j] / (surplus), 4)
 
     def utility(self, playerid):
+        """Permet de calculer l'utilite obtenue par un joueur
+
+        Prend en argument playerid, son indice dans Network.players"""
         total = 0
         thisplayer = self.players[playerid]
         for k, other in enumerate(self.players):
@@ -82,6 +85,7 @@ class Network:
         return total
 
     def display(self):
+        """Affiche un pyplot du Network, ainsi que les moyennes de consommation en a et b"""
         graph = nx.Graph()
         for k in list(range(self.size)):
             graph.add_node(k, pay=self.utility(k))
@@ -115,6 +119,7 @@ class Network:
         plt.show()
 
     def step(self):
+        """Fait evoluer chaque joueur en le faisant executer son .optimize() avec l'etat actual du jeu"""
         curstate = []
         for i, player in enumerate(self.players):
             curstate.append([{"consumption": other.consumption["a"], "influence": self.graph[
