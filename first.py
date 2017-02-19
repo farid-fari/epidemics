@@ -1,23 +1,29 @@
-import random
+#import random
 import social
 
 
 def generate_game(size):
     players = []
-    for _ in range(size):
-        players.append(social.Player(random.random()))
-    network = social.Network(players, {"a": 7, "b": 0.5}, {
-        "a": 9, "b": 5})
+    for i in range(size):
+        players.append(social.Player(int((i - size / 2) >= 0)))
+    graph = [[0 for _ in players] for _ in players]
+    '''for i in range(size):
+        for j in range(size):
+            if i != j and (i - size / 2) * (j - size / 2) >= 0:
+                graph[i][j] = 2 / (size - 1)'''
+    network = social.Network(players, {"a": .5, "b": .5}, {
+        "a": 9, "b": 5}, graph=graph)
     return network
 
 for _ in range(100):
-    our_game = generate_game(100)
-    for _ in range(100):
-        our_game.display()
+    our_game = generate_game(5)
+    for k in range(100):
+        if k % 5 == 0:
+            our_game.display()
         our_game.step()
-    avega = sum([player.consumption["a"]
+    avega = sum([player.consumption["a"] + .5
                  for player in our_game.players]) / our_game.size
-    avegb = sum([player.consumption["b"]
+    avegb = sum([player.consumption["b"] + .5
                  for player in our_game.players]) / our_game.size
     print("{'a':" + str(round(avega, 2)) +
           ", 'b':" + str(round(avegb, 2)) + "}")
