@@ -53,7 +53,7 @@ nx.draw_shell(
     vmin=0,
     vmax=2,
     edge_color=[t[2]['color'] for t in graph.edges(data=True)],
-    edge_cmap=mtpl.cm.get_cmap(name="plasma"),
+    edge_cmap=mtpl.cm.get_cmap(name="hsv"),
     edge_vmin=0,
     edge_vmax=2,
     with_labels=True,
