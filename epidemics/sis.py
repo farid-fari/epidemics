@@ -15,19 +15,19 @@ people = list(range(n))
 probas = scipy.linspace(0, 1, 1000)
 y = [0 for _ in range(1000)]
 
-def compute(i, p):
-    global y, amount
+def compute(q, p):
+    global y
     sumoftries = 0
     for _ in range(100):
         graph = nx.MultiDiGraph()
         graph.add_nodes_from(people, state=0, age=0, infections=0)
         graph.node[rand.randint(0, n - 1)]['state'] = 1
         connections = [[0 for _ in people] for _ in people]
-        for i in people:
+        for r in people:
             for j in people:
-                if i != j and rand.random() < .1:
-                    connections[i][j] = 1
-                    graph.add_edge(i, j, color=0)
+                if r != j and rand.random() < .1:
+                    connections[r][j] = 1
+                    graph.add_edge(r, j, color=0)
 
         for _ in range(300):
             for node in graph.nodes(data=True):
@@ -43,17 +43,26 @@ def compute(i, p):
                         node[1]['state'] = 0
                         node[1]['age'] = 0
 
-        sumoftries += sum([k[1]['infections'] for k in graph.nodes(data=True)])/300
-    y[i] = sumoftries/100/n
-    print(p, y[i])
-    amount.release()
+        sumoftries += sum([k[1]['infections'] for k in graph.nodes(data=True)])/n/300
 
-amount = threading.BoundedSemaphore(value=8)
+    write.acquire()
+    y[i] = sumoftries/100
+    print(q, y[q])
+    write.release()
+
+    amount.release()
+    return True
+
+amount = threading.BoundedSemaphore(value=6)
+write = threading.Lock()
 
 for i in range(1000):
     amount.acquire()
     t = threading.Thread(target=compute, args=(i, probas[i]))
     t.start()
+
+for i in range(6):
+    amount.acquire()
 
 deriv = [0] + [y[i+1]-y[i-1] for i in range(1, 999)] + [0]
 
