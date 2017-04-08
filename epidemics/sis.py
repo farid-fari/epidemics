@@ -1,3 +1,5 @@
+''' Illustre un comportement typique d'une épidémie dans un réseau de type SIS. '''
+
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
@@ -14,9 +16,8 @@ turns = 30
 # On crée le graphe avec les personnes en question
 people = list(range(n))
 graph = nx.MultiDiGraph()
-# state = 0=S et 1=I, age = nombre de tours infecte, infections = nombre de cycle d'infection
+# state = 0=S et 1=I, age = nombre de tours infecté, infections = nombre de cycle d'infection
 graph.add_nodes_from(people, state=0, age=0, infections=0)
-#
 
 # On infecte un patient zero en on l'affiche
 graph.node[rand.randint(0, n - 1)]['state'] = 1
@@ -87,7 +88,12 @@ nx.draw_shell(
     linewidths=0.2,
     width=10 / n)
 
+mtpl.pyplot.suptitle("Etat final du réseau")
+
 mtpl.pyplot.figure(2)
+mtpl.pyplot.suptitle("Infectés en fonction du tour")
+mtpl.pyplot.xlabel("Tour")
+mtpl.pyplot.grid()
 mtpl.pyplot.bar(list(range(turns + 1)), infected)
 
 mtpl.pyplot.show()

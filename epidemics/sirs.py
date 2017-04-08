@@ -1,3 +1,5 @@
+''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS. '''
+
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
@@ -6,10 +8,10 @@ import matplotlib as mtpl
 mtpl.pyplot.cla()
 
 # n = nombre de personnes, d = duration de l'infection et de l'inactivite, p = probabilite d'infection, turns = nombre de tours à simuler
-n = 50
+n = 100
 d = [4, 2]
-p = 0.1
-turns = 30
+p = 0.05
+turns = 100
 
 # On crée le graphe avec les personnes en question
 people = list(range(n))
@@ -92,15 +94,19 @@ nx.draw_shell(
     cmap=mtpl.cm.get_cmap(name="Dark2"),
     vmin=0,
     vmax=1,
-    edge_color=[t[2]['color'] for t in graph.edges(data=True)],
+    edge_color=[2 - t[2]['color'] for t in graph.edges(data=True)],
     edge_cmap=mtpl.cm.get_cmap(name="hsv"),
     edge_vmin=0,
     edge_vmax=2,
-    with_labels=True,
     linewidths=0.2,
     width=10 / n)
 
+matplotlib.pyplot.suptitle("Etat final du réseau")
+
 mtpl.pyplot.figure(2)
+mtpl.pyplot.suptitle("Infectés et retirés en fonction du tour")
+mtpl.pyplot.xlabel("Tour")
+mtpl.pyplot.grid()
 mtpl.pyplot.bar(list(range(turns + 1)), infected, color='b')
 mtpl.pyplot.bar(list(range(turns + 1)), removed, color='r')
 
