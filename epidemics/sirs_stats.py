@@ -1,15 +1,15 @@
 ''' Construit une base de données de statistiques concernant le modèle SIRS '''
 
-# Sera implementé dans une version future
-#import threading
 import random as rand
 import sqlite3 as sq
 
 import networkx as nx
+import matplotlib.pyplot as plt
 
-connection = sq.connect('sirs.db')
+# On crée le tableau en mémoire puisqu'il est temporaire 
+connection = sq.connect(':memory:')
 c = connection.cursor()
-c.execute('CREATE TABLE IF NOT EXISTS Statistics (SimId integer, Turn integer, Infected integer, Removed integer)')
+c.execute('CREATE TABLE Statistics (SimId integer, Turn integer, Infected integer, Removed integer)')
 
 # n = nombre de personnes, d = duration de l'infection et de l'inactivite, p = probabilite d'infection, turns = nombre de tours à simuler
 # NE PAS CHANGER SANS REMETTRE LA BDD A ZERO
@@ -25,13 +25,7 @@ people = list(range(n))
 for k in list(range(1000)):
     # On utilise un try afin de pouvoir interrompre le programme avec un KeyboardInterrupt
     try:
-        nextid = c.execute('SELECT MAX(SimId) FROM Statistics').fetchone()[0]
-        if nextid is None:
-            nextid = 0
-        else:
-            nextid = nextid + 1
-        print(k, nextid)
-
+        print(k)
         graph = nx.MultiDiGraph()
         # Inutile ici de gérer le nombre d'infections par patient
         graph.add_nodes_from(people, state=0, age=0)
@@ -80,16 +74,29 @@ for k in list(range(1000)):
                         node[1]['state'] = 0
                         node[1]['age'] = 0
             # On enregistre succesivement les valeurs
-            c.execute('INSERT INTO Statistics VALUES(?, ?, ?, ?)', (nextid, m, counter, remcounter))
-        if not k % 10:
+            c.execute('INSERT INTO Statistics VALUES(?, ?, ?, ?)', (k, m, counter, remcounter))
+        if not k % 20:
             connection.commit()
     except KeyboardInterrupt:
         print("cancelled")
-        connection.commit()
         connection.close()
         exit()
 
 print('done')
-connection.commit()
+connection.commit() # Par sureté
+
+x = []
+infected = []
+removed = []
+
+# On veut tracer des moyennes par tour
+for k in c.execute('SELECT Turn,AVG(Infected),AVG(Removed) FROM Statistics GROUP BY Turn'):
+    x.append(k[0])
+    infected.append(k[1])
+    removed.append(k[2])
+
 connection.close()
-# Voir query.sql pour avoir une idée des visualisations intéressantes à en tirer
+
+plt.plot(x, infected, 'g')
+plt.plot(x, removed, 'r')
+plt.show()
