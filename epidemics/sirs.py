@@ -18,7 +18,6 @@ people = list(range(n))
 graph = nx.MultiDiGraph()
 # state = 0=S, 1=I, 2=R, age = nombre de tours infecte, infections = nombre de cycle d'infection
 graph.add_nodes_from(people, state=0, age=0, infections=0)
-#
 
 # On infecte un patient zero en on l'affiche
 graph.node[rand.randint(0, n - 1)]['state'] = 1
@@ -58,21 +57,21 @@ for m in range(turns):
                             # De plus, on le compte
                             counter += 1
                             # Pour la coloration
-                            graph.add_edge(node[0], other, color=2)
+                            graph.edge[node[0]][other][0]['color'] = 2
 
                             print(m, node[0], "i", other)
                         else:
-                            graph.add_edge(node[0], other, color=1)
+                            graph.edge[node[0]][other][0]['color'] = 1
 
                             print(m, node[0], "t", other)
             else:
-                # En fin de compte, il n'est pas infecté
+                # En fin de compte, il n'est pas infecté, mais retiré
                 counter -= 1
+                remcounter += 1
 
                 # Passage en mode retiré
                 node[1]['state'] = 2
                 node[1]['age'] = 0
-                remcounter += 1
 
                 print(m, node[0], "r")
         elif node[1]['state'] == 2:

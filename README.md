@@ -14,4 +14,4 @@ Basé sur [Competitive Diffusion in Social Networks: Quality or Seeding?](https:
 
 ## Dépendances
 
-Il est nécessaire d'installer les librairies `networkx`, `matplotlib` et `scipy` afin de pouvoir éxecuter les scripts Python. Le code est écrit pour **Python 3.6**.
+Le code est écrit pour **Python 3.6**. Il est nécessaire d'installer les librairies `networkx`, `matplotlib` et `scipy` afin de pouvoir éxecuter les scripts Python.

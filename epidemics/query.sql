@@ -1,0 +1,1 @@
+SELECT Turn, AVG(Infected), AVG(Removed) FROM Statistics GROUP BY Turn

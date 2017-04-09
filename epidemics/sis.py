@@ -55,11 +55,11 @@ for m in range(turns):
                             # De plus, on le compte
                             counter += 1
                             # Pour la coloration
-                            graph.add_edge(node[0], other, color=2)
+                            graph.edge[node[0]][other][0]['color'] = 2
 
                             print(m, "-", node[0], "i", other)
                         else:
-                            graph.add_edge(node[0], other, color=1)
+                            graph.edge[node[0]][other][0]['color'] = 1
 
                             print(m, "-", node[0], "t", other)
             else:
