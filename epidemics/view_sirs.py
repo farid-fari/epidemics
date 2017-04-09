@@ -17,3 +17,5 @@ for k in c.execute('SELECT Turn,AVG(Infected),AVG(Removed) FROM Statistics GROUP
 plt.plot(x, infected, 'g')
 plt.plot(x, removed, 'r')
 plt.show()
+
+connection.close()
