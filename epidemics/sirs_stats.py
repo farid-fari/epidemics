@@ -81,7 +81,8 @@ for k in list(range(1000)):
                         node[1]['age'] = 0
             # On enregistre succesivement les valeurs
             c.execute('INSERT INTO Statistics VALUES(?, ?, ?, ?)', (nextid, m, counter, remcounter))
-        connection.commit()
+        if not (k % 10):
+            connection.commit()
     except KeyboardInterrupt:
         print("cancelled")
         connection.commit()
