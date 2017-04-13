@@ -1,5 +1,13 @@
-''' Illustre un comportement typique d'une épidémie dans un réseau de type SIR. '''
+''' Illustre un comportement typique d'une épidémie dans un réseau de type SIR.
 
+Prend pour arguments sur ligne de commande:
+    n (int): nombre de personnes
+    d (int): duration de l'infection en tours
+    p (int): probabilité d'infection
+    turns (int): nombre de tours à simuler
+    density (int): probabilité que deux noeuds soient connectés'''
+
+import sys
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
@@ -8,10 +16,21 @@ import matplotlib as mtpl
 mtpl.pyplot.cla()
 
 # n = nombre de personnes, d = duration de l'infection en tours, p = probabilite d'infection, turns = nombre de tours à simuler
-n = 50
-d = 300
-p = 0.0
-turns = 50
+n = 30
+d = 3
+p = 0.1
+turns = 30
+density = 0.1
+if len(sys.argv) >= 2:
+    n = int(sys.argv[1])
+if len(sys.argv) >= 3:
+    d = int(sys.argv[2])
+if len(sys.argv) >= 4:
+    p = float(sys.argv[3])
+if len(sys.argv) >= 5:
+    turns = int(sys.argv[4])
+if len(sys.argv) >= 6:
+    density = float(sys.argv[5])
 
 people = list(range(n))
 graph = nx.MultiDiGraph()
@@ -28,7 +47,7 @@ removed = [0]
 for i in people:
     for j in people:
         # La probabilité 0.1 génère de jolis graphes, pas trop liés
-        if i != j and rand.random() < .1:
+        if i != j and rand.random() < density:
             # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
             graph.add_edge(i, j, color=0)
 
@@ -37,30 +56,30 @@ for m in range(turns):
     counter = 0
     # On accumule les retirés
     remcounter = removed[-1]
-    for node in graph.nodes(data=True):
-        if node[1]['state'] == 1:
-            counter += 1
-            if node[1]['age'] < d:
-                node[1]['age'] += 1
-                for other in graph[node[0]]:
-                    if not graph.node[other]['state']:
-                        if rand.random() < p:
-                            # On enregistre les informations comme étant infecté
-                            graph.node[other]['state'] = 1
-                            graph.edge[node[0]][other][0]['color'] = 2
-                            # On compte le nouvel infecté
-                            counter += 1
+    # Evite de traiter les patients infectés le tour meme: on filtre dès le début
+    for node in [k for k in graph.nodes(data=True) if k[1]['state'] == 1]:
+        counter += 1
+        if node[1]['age'] < d:
+            node[1]['age'] += 1
+            for other in graph[node[0]]:
+                if not graph.node[other]['state']:
+                    if rand.random() < p:
+                        # On enregistre les informations comme étant infecté
+                        graph.node[other]['state'] = 1
+                        graph.edge[node[0]][other][0]['color'] = 2
+                        # On compte le nouvel infecté
+                        counter += 1
 
-                            print(m, "-", node[0], "i", other)
-                        else:
-                            graph.edge[node[0]][other][0]['color'] = 1
-                            print(m, "-", node[0], "t", other)
-            else:
-                # On l'a compté en trop
-                counter -= 1
-                remcounter += 1
-                node[1]['state'] = 2
-                print(m, "-", node[0], "d")
+                        print(m, "-", node[0], "i", other)
+                    else:
+                        graph.edge[node[0]][other][0]['color'] = 1
+                        print(m, "-", node[0], "t", other)
+        elif node[1]['age'] >= d:
+            # On l'a compté en trop
+            counter -= 1
+            remcounter += 1
+            node[1]['state'] = 2
+            print(m, "-", node[0], "d")
     # On enregistre ce qu'on a compté
     infected.append(counter)
     removed.append(remcounter)

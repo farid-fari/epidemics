@@ -1,5 +1,14 @@
-''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS. '''
+''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS.
 
+Prend pour arguments sur ligne de commande:
+    n (int): nombre de personnes
+    d[0] (int): duration de l'infection en tours
+    d[1] (int): duration de l'immunité en tours
+    p (int): probabilité d'infection
+    turns (int): nombre de tours à simuler
+    density (int): probabilité que deux noeuds soient connectés'''
+
+import sys
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
@@ -12,6 +21,19 @@ n = 100
 d = [4, 2]
 p = 0.05
 turns = 100
+density = 0.1
+if len(sys.argv) >= 2:
+    n = int(sys.argv[1])
+if len(sys.argv) >= 3:
+    d = int(sys.argv[2])
+if len(sys.argv) >= 4:
+    d = int(sys.argv[3])
+if len(sys.argv) >= 5:
+    p = float(sys.argv[4])
+if len(sys.argv) >= 6:
+    turns = int(sys.argv[5])
+if len(sys.argv) >= 7:
+    density = float(sys.argv[6])
 
 # On crée le graphe avec les personnes en question
 people = list(range(n))
@@ -32,7 +54,7 @@ removed = [0]
 for i in people:
     for j in people:
         # La probabilité 0.1 génère de jolis graphes, pas trop liés
-        if i != j and rand.random() < .1:
+        if i != j and rand.random() < density:
             # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
             graph.add_edge(i, j, color=0)
 

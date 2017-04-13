@@ -1,5 +1,13 @@
-''' Illustre un comportement typique d'une épidémie dans un réseau de type SIS. '''
+''' Illustre un comportement typique d'une épidémie dans un réseau de type SIS.
 
+Prend pour arguments sur ligne de commande:
+    n (int): nombre de personnes
+    d (int): duration de l'infection en tours
+    p (int): probabilité d'infection
+    turns (int): nombre de tours à simuler
+    density (int): probabilité que deux noeuds soient connectés'''
+
+import sys
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
@@ -9,9 +17,20 @@ mtpl.pyplot.cla()
 
 # n = nombre de personnes, d = duration de l'infection en tours, p = probabilite d'infection, turns = nombre de tours à simuler
 n = 50
-d = 300
+d = 3
 p = 0.1
 turns = 30
+density = 0.1
+if len(sys.argv) >= 2:
+    n = int(sys.argv[1])
+if len(sys.argv) >= 3:
+    d = int(sys.argv[2])
+if len(sys.argv) >= 4:
+    p = float(sys.argv[3])
+if len(sys.argv) >= 5:
+    turns = int(sys.argv[4])
+if len(sys.argv) >= 6:
+    density = float(sys.argv[5])
 
 # On crée le graphe avec les personnes en question
 people = list(range(n))
@@ -30,47 +49,46 @@ infected = [1]
 # Creation de connections aléatoires
 for i in people:
     for j in people:
-        # La probabilité 0.1 génère de jolis graphes, pas trop liés
-        if i != j and rand.random() < .1:
+        # La variable density donne la probabilité d'existence de liens
+        if i != j and rand.random() < density:
             # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
             graph.add_edge(i, j, color=0)
 
 for m in range(turns):
     # Afin d'éviter de faire une boucle de comptage, on compte les infectés au fur et à mesure
     counter = 0
-    for node in graph.nodes(data=True):
-        # On ne s'interesse qu'aux patients infectés
-        if node[1]['state'] == 1:
-            counter += 1
-            if node[1]['age'] < d:
-                node[1]['age'] += 1
-                for other in graph[node[0]]:
-                    # Si l'autre est dans l'état S
-                    if not graph.node[other]['state']:
-                        if rand.random() < p:
-                            # On met les stats au mode infecté
-                            graph.node[other]['state'] = 1
-                            graph.node[other]['age'] = 0 # par sureté (non nécessaire)
-                            graph.node[other]['infections'] += 1
-                            # De plus, on le compte
-                            counter += 1
-                            # Pour la coloration
-                            graph.edge[node[0]][other][0]['color'] = 2
+    # Evite de traiter les patients infectés le tour meme: on filtre dès le début
+    for node in [k for k in graph.nodes(data=True) if k[1]['state'] == 1]:
+        counter += 1
+        if node[1]['age'] < d:
+            node[1]['age'] += 1
+            for other in graph[node[0]]:
+                # Si l'autre est dans l'état S
+                if not graph.node[other]['state']:
+                    if rand.random() < p:
+                        # On met les stats au mode infecté
+                        graph.node[other]['state'] = 1
+                        graph.node[other]['age'] = 0 # par sureté (non nécessaire)
+                        graph.node[other]['infections'] += 1
+                        # De plus, on le compte
+                        counter += 1
+                        # Pour la coloration
+                        graph.edge[node[0]][other][0]['color'] = 2
 
-                            print(m, "-", node[0], "i", other)
-                        else:
-                            graph.edge[node[0]][other][0]['color'] = 1
+                        print(m, "-", node[0], "i", other)
+                    else:
+                        graph.edge[node[0]][other][0]['color'] = 1
 
-                            print(m, "-", node[0], "t", other)
-            else:
-                # En fin de compte, il n'est pas infecté
-                counter -= 1
+                        print(m, "-", node[0], "t", other)
+        else:
+            # En fin de compte, il n'est pas infecté
+            counter -= 1
 
-                # Remise à zero des statistiques
-                node[1]['state'] = 0
-                node[1]['age'] = 0
+            # Remise à zero des statistiques
+            node[1]['state'] = 0
+            node[1]['age'] = 0
 
-                print(m, "-", node[0], "r")
+            print(m, "-", node[0], "r")
     # On enregistre succesivement les valeurs pour les tracer plus tard
     infected.append(counter)
 
