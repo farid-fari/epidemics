@@ -7,7 +7,7 @@ import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
 
-def plot(n=60, d=[3, 2], p=0.1, turns=10, density=0.1, verbose=False):
+def plot(n=60, d=[4, 2], p=0.05, turns=200, density=0.3, verbose=False):
     '''Trace un graphe du modèle SIRS après un nombre défini de tours.
 
     n (int): nombre de personnes
@@ -113,16 +113,16 @@ def plot(n=60, d=[3, 2], p=0.1, turns=10, density=0.1, verbose=False):
     mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
     mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
     mtpl.pyplot.plot(-1, -1.4, marker='o', color=(13/255, 8/255, 135/255))
-    mtpl.pyplot.text(-.95, -1.04, "Susceptible", fontsize=9)
-    mtpl.pyplot.text(-.95, -1.24, "Infecté", fontsize=9)
-    mtpl.pyplot.text(-.95, -1.44, "Retiré", fontsize=9)
+    mtpl.pyplot.text(-.95, -1.03, "Susceptible", fontsize=9)
+    mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
+    mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
     mtpl.pyplot.figure(2)
     mtpl.pyplot.suptitle("Infectés et retirés en fonction du tour")
     mtpl.pyplot.xlabel("Tour")
     mtpl.pyplot.grid()
-    mtpl.pyplot.bar(list(range(turns + 1)), infected, color='b')
-    mtpl.pyplot.bar(list(range(turns + 1)), removed, color='r')
+    mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))
+    mtpl.pyplot.bar(list(range(turns + 1)), removed, color=(13/255, 8/255, 135/255))
 
     mtpl.pyplot.show()
 

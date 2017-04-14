@@ -1,30 +1,32 @@
-''' Construit une base de données de statistiques concernant le modèle SIRS '''
+'''Construit un résultat moyen au modèle SIRS pour des paramètres donnés'''
 
 import random as rand
 import sqlite3 as sq
-
 import networkx as nx
 import matplotlib.pyplot as plt
 
-# On crée le tableau en mémoire puisqu'il est temporaire 
-connection = sq.connect(':memory:')
-c = connection.cursor()
-c.execute('CREATE TABLE Statistics (SimId integer, Turn integer, Infected integer, Removed integer)')
 
-# n = nombre de personnes, d = duration de l'infection et de l'inactivite, p = probabilite d'infection, turns = nombre de tours à simuler
-# NE PAS CHANGER SANS REMETTRE LA BDD A ZERO
-n = 100
-d = [4, 2]
-p = 0.1
-# On peut changer cependant turns, puisque la BDD enregistre le tour
-turns = 200
+def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600):
+    '''Trace un graphe moyen du modèle SIRS après un nombre défini de tours.
 
-# Voir sirs.py pour le reste des commentaires)
-people = list(range(n))
-# Le programme tourne indéfiniment jusqu'à être interrompu
-for k in list(range(1000)):
-    # On utilise un try afin de pouvoir interrompre le programme avec un KeyboardInterrupt
-    try:
+    n (int): nombre de personnes
+    d[0] (int): duration de l'infection en tours
+    d[1] (int): duration de l'immunité en tours
+    p (int): probabilité d'infection
+    turns (int): nombre de tours à simuler
+    density (int): probabilité que deux noeuds soient connectés'''
+
+    # On crée le tableau en mémoire puisqu'il est temporaire
+    connection = sq.connect(':memory:')
+    c = connection.cursor()
+    c.execute('CREATE TABLE Statistics (SimId integer, Turn integer, Infected integer, Removed integer)')
+    # La base de données permet le calcul rapide et efficace de moyennes sur un grand nombre de tours et de graphes
+
+    # n = nombre de personnes, d = duration de l'infection et de l'inactivite, p = probabilite d'infection, turns = nombre de tours à simuler
+
+    # Voir sirs.py pour le reste des commentaires
+    people = list(range(n))
+    for k in list(range(sample)):
         print(k)
         graph = nx.MultiDiGraph()
         # Inutile ici de gérer le nombre d'infections par patient
@@ -34,16 +36,15 @@ for k in list(range(1000)):
 
         for i in people:
             for j in people:
-                if i != j and rand.random() < .1:
+                if i != j and rand.random() < density:
                     # Inutile de gérer les couleurs
                     graph.add_edge(i, j)
 
         for m in range(turns):
-
             counter = 0
             remcounter = 0
-
-            for node in graph.nodes(data=True):
+            # Le nom k est déjà utilisé
+            for node in [item for item in graph.nodes(data=True) if item[1]['state'] >= 1]:
                 if node[1]['state'] == 1:
                     counter += 1
                     if node[1]['age'] < d[0]:
@@ -77,26 +78,27 @@ for k in list(range(1000)):
             c.execute('INSERT INTO Statistics VALUES(?, ?, ?, ?)', (k, m, counter, remcounter))
         if not k % 20:
             connection.commit()
-    except KeyboardInterrupt:
-        print("cancelled")
-        connection.close()
-        exit()
 
-print('done')
-connection.commit() # Par sureté
+    connection.commit() # Par sureté
 
-x = []
-infected = []
-removed = []
+    x = []
+    infected = []
+    removed = []
 
-# On veut tracer des moyennes par tour
-for k in c.execute('SELECT Turn,AVG(Infected),AVG(Removed) FROM Statistics GROUP BY Turn'):
-    x.append(k[0])
-    infected.append(k[1])
-    removed.append(k[2])
+    # On veut tracer des moyennes par tour
+    for k in c.execute('SELECT Turn, AVG(Infected), AVG(Removed) FROM Statistics GROUP BY Turn'):
+        x.append(k[0])
+        infected.append(k[1])
+        removed.append(k[2])
 
-connection.close()
+    connection.close()
 
-plt.plot(x, infected, 'g')
-plt.plot(x, removed, 'r')
-plt.show()
+    plt.suptitle("Infectés et retirés en fonction du tour")
+    plt.xlabel("Tour")
+    plt.grid()
+    plt.bar(x, infected, color=(204/255, 71/255, 120/255))
+    plt.bar(x, removed, color=(13/255, 8/255, 135/255))
+    plt.show()
+
+if __name__ == "__main__":
+    plot_avg()
