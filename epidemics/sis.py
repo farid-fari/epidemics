@@ -1,122 +1,111 @@
 ''' Illustre un comportement typique d'une épidémie dans un réseau de type SIS.
 
-Prend pour arguments sur ligne de commande:
-    n (int): nombre de personnes
-    d (int): duration de l'infection en tours
-    p (int): probabilité d'infection
-    turns (int): nombre de tours à simuler
-    density (int): probabilité que deux noeuds soient connectés'''
+Introduit la fonction plot pour tracer un graphe de modèle SIS.'''
 
-import sys
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
 
-mtpl.pyplot.cla()
+def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
+    '''Trace le graphe du modèle SIS après un nombre de tours défini.
 
-# n = nombre de personnes, d = duration de l'infection en tours, p = probabilite d'infection, turns = nombre de tours à simuler
-n = 50
-d = 3
-p = 0.1
-turns = 30
-density = 0.1
-if len(sys.argv) >= 2:
-    n = int(sys.argv[1])
-if len(sys.argv) >= 3:
-    d = int(sys.argv[2])
-if len(sys.argv) >= 4:
-    p = float(sys.argv[3])
-if len(sys.argv) >= 5:
-    turns = int(sys.argv[4])
-if len(sys.argv) >= 6:
-    density = float(sys.argv[5])
+    n (int): nombre de personnes
+    d (int): duration de l'infection en tours
+    p (int): probabilité d'infection
+    turns (int): nombre de tours à simuler
+    density (int): probabilité que deux noeuds soient connectés
+    verbose (bool): si l'on doit afficher les événements'''
 
-# On crée le graphe avec les personnes en question
-people = list(range(n))
-graph = nx.MultiDiGraph()
-# state = 0=S et 1=I, age = nombre de tours infecté, infections = nombre de cycle d'infection
-graph.add_nodes_from(people, state=0, age=0, infections=0)
+    people = list(range(n))
+    graph = nx.MultiDiGraph()
+    # state = 0=S et 1=I, age = nombre de tours infecté, infections = nombre de cycle d'infection
+    graph.add_nodes_from(people, state=0, age=0, infections=0)
 
-# On infecte un patient zero en on l'affiche
-graph.node[rand.randint(0, n - 1)]['state'] = 1
-print("z -", [t[0] for t in graph.nodes(data=True) if t[1]['state']][0])
-# la première infection ne compte pas comme une vraie infection dans les stats
+    # On infecte un patient zero en on l'affiche
+    graph.node[rand.randint(0, n - 1)]['state'] = 1
+    if verbose:
+        print("z -", [t[0] for t in graph.nodes(data=True) if t[1]['state']][0])
+    # la première infection ne compte pas comme une vraie infection dans les stats
 
-# On retient le nombre d'infectés à chaque tour
-infected = [1]
+    # On retient le nombre d'infectés à chaque tour
+    infected = [1]
 
-# Creation de connections aléatoires
-for i in people:
-    for j in people:
-        # La variable density donne la probabilité d'existence de liens
-        if i != j and rand.random() < density:
-            # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
-            graph.add_edge(i, j, color=0)
+    # Creation de connections aléatoires
+    for i in people:
+        for j in people:
+            # La variable density donne la probabilité d'existence de liens
+            if i != j and rand.random() < density:
+                # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
+                graph.add_edge(i, j, color=0)
 
-for m in range(turns):
-    # Afin d'éviter de faire une boucle de comptage, on compte les infectés au fur et à mesure
-    counter = 0
-    # Evite de traiter les patients infectés le tour meme: on filtre dès le début
-    for node in [k for k in graph.nodes(data=True) if k[1]['state'] == 1]:
-        counter += 1
-        if node[1]['age'] < d:
-            node[1]['age'] += 1
-            for other in graph[node[0]]:
-                # Si l'autre est dans l'état S
-                if not graph.node[other]['state']:
-                    if rand.random() < p:
-                        # On met les stats au mode infecté
-                        graph.node[other]['state'] = 1
-                        graph.node[other]['age'] = 0 # par sureté (non nécessaire)
-                        graph.node[other]['infections'] += 1
-                        # De plus, on le compte
-                        counter += 1
-                        # Pour la coloration
-                        graph.edge[node[0]][other][0]['color'] = 2
+    for m in range(turns):
+        # Afin d'éviter de faire une boucle de comptage, on compte les infectés au fur et à mesure
+        counter = 0
+        # Evite de traiter les patients infectés le tour meme: on filtre dès le début
+        for node in [k for k in graph.nodes(data=True) if k[1]['state'] == 1]:
+            counter += 1
+            if node[1]['age'] < d:
+                node[1]['age'] += 1
+                for other in graph[node[0]]:
+                    # Si l'autre est dans l'état S
+                    if not graph.node[other]['state']:
+                        if rand.random() < p:
+                            # On met les stats au mode infecté
+                            graph.node[other]['state'] = 1
+                            graph.node[other]['age'] = 0 # par sureté (non nécessaire)
+                            graph.node[other]['infections'] += 1
+                            # De plus, on le compte
+                            counter += 1
+                            # Pour la coloration
+                            graph.edge[node[0]][other][0]['color'] = 2
+                            if verbose:
+                                print(m, "-", node[0], "i", other)
+                        else:
+                            graph.edge[node[0]][other][0]['color'] = 1
+                            if verbose:
+                                print(m, "-", node[0], "t", other)
+            else:
+                # En fin de compte, il n'est pas infecté
+                counter -= 1
 
-                        print(m, "-", node[0], "i", other)
-                    else:
-                        graph.edge[node[0]][other][0]['color'] = 1
+                # Remise à zero des statistiques
+                node[1]['state'] = 0
+                node[1]['age'] = 0
+                if verbose:
+                    print(m, "-", node[0], "r")
+        # On enregistre succesivement les valeurs pour les tracer plus tard
+        infected.append(counter)
 
-                        print(m, "-", node[0], "t", other)
-        else:
-            # En fin de compte, il n'est pas infecté
-            counter -= 1
+    mtpl.pyplot.cla()
 
-            # Remise à zero des statistiques
-            node[1]['state'] = 0
-            node[1]['age'] = 0
+    nx.draw_spring(
+        graph,
+        arrows=False,
+        node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
+        cmap=mtpl.cm.get_cmap(name="plasma"),
+        vmin=0,
+        vmax=2,
+        edge_color=[2 - t[2]['color'] for t in graph.edges(data=True)],
+        edge_cmap=mtpl.cm.get_cmap(name="gray"),
+        edge_vmin=0,
+        edge_vmax=2.3,
+        linewidths=0.2,
+        width=10 / n)
 
-            print(m, "-", node[0], "r")
-    # On enregistre succesivement les valeurs pour les tracer plus tard
-    infected.append(counter)
+    mtpl.pyplot.suptitle("Etat final du réseau")
+    mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
+    mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
+    mtpl.pyplot.text(-.95, -1.04, "Susceptible", fontsize=9)
+    mtpl.pyplot.text(-.95, -1.24, "Infecté", fontsize=9)
 
-# On utilise les mêmes échelles de couleurs que les autres modèles
-nx.draw_shell(
-    graph,
-    arrows=False,
-    node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
-    cmap=mtpl.cm.get_cmap(name="plasma"),
-    vmin=0,
-    vmax=2,
-    edge_color=[2 - t[2]['color'] for t in graph.edges(data=True)],
-    edge_cmap=mtpl.cm.get_cmap(name="gray"),
-    edge_vmin=0,
-    edge_vmax=2.3,
-    linewidths=0.2,
-    width=10 / n)
+    mtpl.pyplot.figure(2)
+    mtpl.pyplot.suptitle("Infectés en fonction du tour")
+    mtpl.pyplot.xlabel("Tour")
+    mtpl.pyplot.grid()
+    mtpl.pyplot.bar(list(range(turns + 1)), infected)
 
-mtpl.pyplot.suptitle("Etat final du réseau")
-mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
-mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
-mtpl.pyplot.text(-.95, -1.04, "Susceptible", fontsize=9)
-mtpl.pyplot.text(-.95, -1.24, "Infecté", fontsize=9)
+    mtpl.pyplot.show()
 
-mtpl.pyplot.figure(2)
-mtpl.pyplot.suptitle("Infectés en fonction du tour")
-mtpl.pyplot.xlabel("Tour")
-mtpl.pyplot.grid()
-mtpl.pyplot.bar(list(range(turns + 1)), infected)
-
-mtpl.pyplot.show()
+if __name__ == "__main__":
+    plot()
