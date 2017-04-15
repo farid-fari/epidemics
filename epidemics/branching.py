@@ -7,7 +7,7 @@ import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
 
-def plot(n=5, p=0.5, k=2, verbose=False):
+def plot(n=7, p=0.5, k=2, verbose=False):
     '''Trace le graphe du modèle d'arbres dans une population.
 
         n (int): nombre de tours
@@ -39,7 +39,7 @@ def plot(n=5, p=0.5, k=2, verbose=False):
                         graph.add_edge(i, nextitems + plus)
             nextitems += k
 
-
+    mtpl.pyplot.figure(num=1, figsize=(15, 6))
     nx.draw_networkx(graph,
                      pos=_tree_layout(n, k),
                      node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
@@ -48,9 +48,9 @@ def plot(n=5, p=0.5, k=2, verbose=False):
                      vmax=2,
                      edge_color='r',
                      linewidths=0.2,
-                     width=0.7)
+                     width=0.7,
+                     with_labels=(k**(n-1) <= 30))
 
-    mtpl.pyplot.figure(num=1, figsize=(9, 6))
     mtpl.pyplot.title("Etat final du réseau")
     mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
     mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
@@ -66,9 +66,9 @@ def _tree_layout(n, k):
     x = -1
     dx = 2 / n
     for m in list(range(n)):
-        # les y vont de -.8 à 1
-        y = -.8
-        dy = 1.8 / (k**m)
+        # les y vont de -1 à 1
+        y = -1
+        dy = 2 / (k**m)
         for _ in range(k**m):
             pos.append((x, y + dy / 2))
             y += dy
