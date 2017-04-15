@@ -10,12 +10,12 @@ import matplotlib as mtpl
 def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
     '''Trace le graphe du modèle SIS après un nombre de tours défini.
 
-    n (int): nombre de personnes
-    d (int): duration de l'infection en tours
-    p (int): probabilité d'infection
-    turns (int): nombre de tours à simuler
-    density (int): probabilité que deux noeuds soient connectés
-    verbose (bool): si l'on doit afficher les événements'''
+        n (int): nombre de personnes
+        d (int): duration de l'infection en tours
+        p (float): probabilité d'infection
+        turns (int): nombre de tours à simuler
+        density (float): probabilité que deux noeuds soient connectés
+        verbose (bool): si l'on doit afficher les événements'''
 
     people = list(range(n))
     graph = nx.MultiDiGraph()
@@ -77,7 +77,8 @@ def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
         # On enregistre succesivement les valeurs pour les tracer plus tard
         infected.append(counter)
 
-    mtpl.pyplot.cla()
+    mtpl.pyplot.figure(num=1, figsize=(15, 6))
+    mtpl.pyplot.subplot(1, 2, 1)
 
     nx.draw_spring(
         graph,
@@ -91,16 +92,16 @@ def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
         edge_vmin=0,
         edge_vmax=2.3,
         linewidths=0.2,
-        width=10 / n)
+        width=10/n)
 
-    mtpl.pyplot.suptitle("Etat final du réseau")
+    mtpl.pyplot.title("Etat final du réseau")
     mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
     mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
     mtpl.pyplot.text(-.95, -1.03, "Susceptible", fontsize=9)
     mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
 
-    mtpl.pyplot.figure(2)
-    mtpl.pyplot.suptitle("Infectés en fonction du tour")
+    mtpl.pyplot.subplot(1, 2, 2)
+    mtpl.pyplot.title("Infectés en fonction du tour")
     mtpl.pyplot.xlabel("Tour")
     mtpl.pyplot.grid()
     mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))

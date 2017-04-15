@@ -1,60 +1,79 @@
+'''Illustre le modèle d'un arbre de propagation d'une épidémie.
+
+Introduit la fonction plot pour tracer l'arbre pour un nombre défini de tours.'''
+
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
 
-mtpl.pyplot.cla()
+def plot(n=5, p=0.5, k=2, verbose=False):
+    '''Trace le graphe du modèle d'arbres dans une population.
 
-n = 100
-k = 30
-p = 0.033
-print("r0 =", p*k)
+        n (int): nombre de tours
+        p (float): probabilité d'infection
+        k (int): nombre d'intéractions pour une personne donnée
+        verbose (bool): si l'on doit afficher les événements'''
 
-people = list(range(n))
+    if verbose:
+        print("r0 =", p*k)
 
-sick = [0]*n
-full = [1]*n
-sick[rand.randint(0, n-1)] = 1
+    if k**n >= 175:
+        print("Vous allez générer", k**n - 1, "nodes, cela risque d'être long...")
 
-graph = nx.Graph()
-graph.add_nodes_from(people)
+    people = list(range(int((k**n - 1)/(k - 1))))
+    # Ici, un simple graph suffira, puisque les connections sont simples
+    graph = nx.Graph()
+    graph.add_nodes_from(people, state=0)
+    graph.node[0]['state'] = 1
 
-previous = [p for p in people if sick[p]]
+    # On propage pour chaque prochaine couche sauf la dernière
+    for m in range(n-1):
+        nextitems = int((k**(m+1) - 1)/(k-1))
+        # Pour chaque élément de la couche
+        for i in range(int((k**m - 1)/(k-1)), int((k**(m+1) - 1)/(k-1))):
+            if graph.node[i]['state']:
+                for plus in range(k):
+                    if rand.random() < p:
+                        graph.node[nextitems + plus]['state'] = 1
+                        graph.add_edge(i, nextitems + plus)
+            nextitems += k
 
-u = []
 
-for m in range(10):
-    next_wave = []
-    u.append(len(previous))
-    for i in previous:
-        j = 0
-        while j < k:
-            if sick == full:
-                j = k
-            t = rand.randint(0, n-1)
-            if not sick[t]:
-                j += 1
-                if rand.random() < p:
-                    graph.add_edge(i, t, trans=1)
-                    sick[t] = 1
-                    next_wave.append(t)
-                else:
-                    graph.add_edge(i, t, trans=0)
-    previous = next_wave
+    nx.draw_networkx(graph,
+                     pos=_tree_layout(n, k),
+                     node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
+                     cmap=mtpl.cm.get_cmap(name="plasma"),
+                     vmin=0,
+                     vmax=2,
+                     edge_color='r',
+                     linewidths=0.2,
+                     width=0.7)
 
-nx.draw_circular(graph,
-                 node_color=sick,
-                 cmap=mtpl.cm.get_cmap(name="autumn"),
-                 vmin=0,
-                 vmax=1,
-                 with_labels=True,
-                 edge_color=[1-graph.edge[t[0]][t[1]]['trans'] for t in graph.edges()],
-                 edge_cmap=mtpl.cm.get_cmap(name="winter"),
-                 edge_vmin=0,
-                 edge_vmax=1,
-                 linewidths=0.2,
-                 width=80/n)
+    mtpl.pyplot.figure(num=1, figsize=(9, 6))
+    mtpl.pyplot.title("Etat final du réseau")
+    mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
+    mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
+    mtpl.pyplot.text(-.95, -1.03, "Susceptible", fontsize=9)
+    mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
+    mtpl.pyplot.text(-1, -.9, "R0 = "+str(p*k))
 
-mtpl.pyplot.show()
+    mtpl.pyplot.show()
 
-print("infected: ", u, "\ntotal: ", sum(u), sep="")
+def _tree_layout(n, k):
+    pos = []
+    # les x vont de -1 à 1
+    x = -1
+    dx = 2 / n
+    for m in list(range(n)):
+        # les y vont de -.8 à 1
+        y = -.8
+        dy = 1.8 / (k**m)
+        for _ in range(k**m):
+            pos.append((x, y + dy / 2))
+            y += dy
+        x += dx
+    return pos
+
+if __name__ == "__main__":
+    plot()

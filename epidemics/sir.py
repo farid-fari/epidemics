@@ -12,9 +12,9 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, verbose=False):
 
     n (int): nombre de personnes
     d (int): duration de l'infection en tours
-    p (int): probabilité d'infection
+    p (float): probabilité d'infection
     turns (int): nombre de tours à simuler
-    density (int): probabilité que deux noeuds soient connectés
+    density (float): probabilité que deux noeuds soient connectés
     verbose (bool): si l'on doit afficher les événements'''
 
     people = list(range(n))
@@ -72,7 +72,8 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, verbose=False):
         infected.append(counter)
         removed.append(remcounter)
 
-    mtpl.pyplot.cla()
+    mtpl.pyplot.figure(num=1, figsize=(15, 6))
+    mtpl.pyplot.subplot(1, 2, 1)
 
     nx.draw_spring(
         graph,
@@ -88,7 +89,7 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, verbose=False):
         linewidths=0.2,
         width=10/n)
 
-    mtpl.pyplot.suptitle("Etat final du réseau")
+    mtpl.pyplot.title("Etat final du réseau")
     mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
     mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
     mtpl.pyplot.plot(-1, -1.4, marker='o', color=(13/255, 8/255, 135/255))
@@ -96,9 +97,9 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, verbose=False):
     mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
     mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
-    # Seconde figure pour les infectés et retirés
-    mtpl.pyplot.figure(2)
-    mtpl.pyplot.suptitle("Infectés et retirés en fonction du tour")
+    # Seconde subplot pour les infectés et retirés
+    mtpl.pyplot.subplot(1, 2, 2)
+    mtpl.pyplot.title("Infectés et retirés en fonction du tour")
     mtpl.pyplot.xlabel("Tour")
     mtpl.pyplot.grid()
     mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))

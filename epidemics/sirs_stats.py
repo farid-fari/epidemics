@@ -1,4 +1,6 @@
-'''Construit un résultat moyen au modèle SIRS pour des paramètres donnés'''
+'''Construit un résultat moyen au modèle SIRS pour des paramètres donnés
+
+Introduit la fonction plot_avg pour tracer un graphe moyen'''
 
 import random as rand
 import sqlite3 as sq
@@ -6,15 +8,15 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600):
+def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, verbose=False):
     '''Trace un graphe moyen du modèle SIRS après un nombre défini de tours.
 
-    n (int): nombre de personnes
-    d[0] (int): duration de l'infection en tours
-    d[1] (int): duration de l'immunité en tours
-    p (int): probabilité d'infection
-    turns (int): nombre de tours à simuler
-    density (int): probabilité que deux noeuds soient connectés'''
+        n (int): nombre de personnes
+        d[0] (int): duration de l'infection en tours
+        d[1] (int): duration de l'immunité en tours
+        p (float): probabilité d'infection
+        turns (int): nombre de tours à simuler
+        density (float): probabilité que deux noeuds soient connectés'''
 
     # On crée le tableau en mémoire puisqu'il est temporaire
     connection = sq.connect(':memory:')
@@ -27,7 +29,8 @@ def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600):
     # Voir sirs.py pour le reste des commentaires
     people = list(range(n))
     for k in list(range(sample)):
-        print(k)
+        if verbose:
+            print(k)
         graph = nx.MultiDiGraph()
         # Inutile ici de gérer le nombre d'infections par patient
         graph.add_nodes_from(people, state=0, age=0)
@@ -93,6 +96,7 @@ def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600):
 
     connection.close()
 
+    plt.figure(num=1, figsize=(15, 6))
     plt.suptitle("Infectés et retirés en fonction du tour")
     plt.xlabel("Tour")
     plt.grid()
