@@ -18,8 +18,8 @@ def plot(n=7, p=0.5, k=2, verbose=False):
 	if verbose:
 		print("r0 =", p*k)
 
-	if k**n >= 175:
-		print("Vous allez générer", k**n - 1, "nodes, cela risque d'être long...")
+	if (k**n - 1)/(k - 1) >= 300:
+		print("Vous allez générer", (k**n - 1)/(k - 1), "nodes, cela risque d'être long...")
 
 	people = list(range(int((k**n - 1)/(k - 1))))
 	# Ici, un simple graph suffira, puisque les connections sont simples
