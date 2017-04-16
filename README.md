@@ -6,7 +6,7 @@ Inspiré de [*Networks, Crowds and Markets*](https://www.cs.cornell.edu/home/kle
 
 ## Exemple
 
-Exemple de résultat obtenu avec `sir.py` pour paramètres `n=60, d=3, p=0.2, turns=10, density=0.1`:
+Exemple de résultat obtenu avec `sirs.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=50, density=0.3`:
 
 ![example](epidemics/example_SIR.png?raw=true)
 

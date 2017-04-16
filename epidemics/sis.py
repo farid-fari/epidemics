@@ -7,7 +7,7 @@ import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
 
-def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
+def plot(n=30, d=3, p=0.1, turns=30, density=0.2, graph=None, verbose=False):
     '''Trace le graphe du modèle SIS après un nombre de tours défini.
 
         n (int): nombre de personnes
@@ -15,29 +15,42 @@ def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
         p (float): probabilité d'infection
         turns (int): nombre de tours à simuler
         density (float): probabilité que deux noeuds soient connectés
+        graph (nx.Graph): un éventuel graphe imposé
         verbose (bool): si l'on doit afficher les événements'''
 
-    people = list(range(n))
-    graph = nx.MultiDiGraph()
-    # state = 0=S et 1=I, age = nombre de tours infecté, infections = nombre de cycle d'infection
-    graph.add_nodes_from(people, state=0, age=0, infections=0)
+    if graph is None:
+        people = list(range(n))
+        graph = nx.DiGraph()
+
+        # state = 0=S et 1=I, age = nombre de tours infecté, infections = nombre de cycle d'infection
+        graph.add_nodes_from(people, state=0, age=0, infections=0)
+
+        # Creation de connections aléatoires
+        for i in people:
+            for j in people:
+                # La variable density donne la probabilité d'existence de liens
+                if i != j and rand.random() < density:
+                    # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
+                    graph.add_edge(i, j, color=0)
+    else:
+        # On initialise le nombre de personnes
+        n = graph.number_of_nodes()
+
+        # On initialise les attributs nécessaires
+        for node in graph.nodes(data=True):
+            node[1]['state'] = 0
+            node[1]['age'] = 0
+            node[1]['infections'] = 0
+        for edge in graph.edges(data=True):
+            edge[2]['color'] = 0
 
     # On infecte un patient zero en on l'affiche
     graph.node[rand.randint(0, n - 1)]['state'] = 1
     if verbose:
         print("z -", [t[0] for t in graph.nodes(data=True) if t[1]['state']][0])
-    # la première infection ne compte pas comme une vraie infection dans les stats
 
     # On retient le nombre d'infectés à chaque tour
     infected = [1]
-
-    # Creation de connections aléatoires
-    for i in people:
-        for j in people:
-            # La variable density donne la probabilité d'existence de liens
-            if i != j and rand.random() < density:
-                # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
-                graph.add_edge(i, j, color=0)
 
     for m in range(turns):
         # Afin d'éviter de faire une boucle de comptage, on compte les infectés au fur et à mesure
@@ -58,11 +71,11 @@ def plot(n=30, d=3, p=0.1, turns=30, density=0.2, verbose=False):
                             # De plus, on le compte
                             counter += 1
                             # Pour la coloration
-                            graph.edge[node[0]][other][0]['color'] = 2
+                            graph.edge[node[0]][other]['color'] = 2
                             if verbose:
                                 print(m, "-", node[0], "i", other)
                         else:
-                            graph.edge[node[0]][other][0]['color'] = 1
+                            graph.edge[node[0]][other]['color'] = 1
                             if verbose:
                                 print(m, "-", node[0], "t", other)
             else:
