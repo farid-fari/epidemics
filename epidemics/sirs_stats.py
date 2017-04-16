@@ -6,6 +6,7 @@ import random as rand
 import sqlite3 as sq
 import networkx as nx
 import matplotlib.pyplot as plt
+import jgraph
 
 
 def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, verbose=False):
@@ -97,7 +98,8 @@ def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, verbos
 	connection.close()
 
 	plt.figure(num=1, figsize=(15, 6))
-	plt.suptitle("Infectés et retirés en fonction du tour")
+	plt.suptitle("Moyenne des infectés et retirés en fonction du tour")
+	plt.title(str(sample) + " itérations", style='italic')
 	plt.xlabel("Tour")
 	plt.grid()
 	plt.bar(x, infected, color=(204/255, 71/255, 120/255))

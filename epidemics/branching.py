@@ -47,9 +47,9 @@ def plot(n=7, p=0.5, k=2, verbose=False):
 					 vmin=0,
 					 vmax=2,
 					 edge_color='r',
-					 linewidths=0.2,
-					 width=0.7,
-					 with_labels=(k**(n-1) <= 30))
+					 with_labels=(k**(n-1) <= 30),
+					 node_size=5000/(k**(n-1))+200,
+					 width=0.1)
 
 	mtpl.pyplot.title("Etat final du réseau")
 	mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))

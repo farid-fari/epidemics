@@ -110,8 +110,8 @@ def plot(n=30, d=3, p=0.1, turns=30, density=0.2, graph=None, verbose=False):
 				edge_cmap=mtpl.cm.get_cmap(name="gray"),
 				edge_vmin=0,
 				edge_vmax=2.3,
-				linewidths=0.2,
-				width=10/n)
+				node_size=5000/n+200,
+				width=0.1)
 
 	mtpl.pyplot.title("Etat final du réseau")
 	mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
