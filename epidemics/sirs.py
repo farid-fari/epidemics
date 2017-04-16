@@ -129,7 +129,7 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 				edge_vmin=0,
 				edge_vmax=2.3,
 				node_size=5000/n+200,
-				width=0.1)
+				width=0.2)
 
 	mtpl.pyplot.title("Etat final du réseau")
 	mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
