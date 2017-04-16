@@ -20,31 +20,23 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 		verbose (bool): si l'on doit afficher les événements'''
 
 	if graph is None:
-		people = list(range(n))
-		graph = nx.DiGraph()
-		# state = 0=S, 1=I, 2=R, age = nombre de tours infecte, infections = nombre de cycle d'infection
-		graph.add_nodes_from(people, state=0, age=0, infections=0)
-
-		# Création de connections aléatoires
-		for i in people:
-			for j in people:
-				# La probabilité 0.1 génère de jolis graphes, pas trop liés
-				if i != j and rand.random() < density:
-					# color = 0 neutre, 1 tentative d'infection, 2 infection transmise
-					# vector = 0.01 simple connection, 0.05 si essai de transmission,  1 sinon: sert dans l'affichage en ressorts
-					graph.add_edge(i, j, color=0, vector=0.01)
+		graph = nx.gnp_random_graph(n, density, directed=True)
 	else:
 		# On initialise le nombre de personnes
 		n = graph.number_of_nodes()
 
-		# On initialise les attributs
-		for node in graph.nodes(data=True):
-			node[1]['state'] = 0
-			node[1]['age'] = 0
-			node[1]['infections'] = 0
-		for edge in graph.edges(data=True):
-			edge[2]['color'] = 0
-			edge[2]['vector'] = 0.01
+	# On initialise les attributs
+	for node in graph.nodes(data=True):
+		# state = 0=S et 1=I, age = nombre de tours infecté
+		node[1]['state'] = 0
+		# age = nombre de tours infecté
+		node[1]['age'] = 0
+		node[1]['infections'] = 0
+	for edge in graph.edges(data=True):
+		# color = 0 neutre, 1 tentative d'infection, 2 infection transmise
+		edge[2]['color'] = 0
+		# vector = 0.01 simple connection, 0.05 si essai de transmission,  1 sinon: sert dans l'affichage en ressorts
+		edge[2]['vector'] = 0.01
 
 	# On infecte un patient zero en on l'affiche
 	graph.node[rand.randint(0, n - 1)]['state'] = 1
