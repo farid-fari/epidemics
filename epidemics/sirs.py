@@ -1,17 +1,18 @@
-''' Illustre un comportement typique d'une épidémie dans un réseau de type SIR.
+''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS.
 
-Introduit la fonction plot pour tracer un graphe'''
+Introduit la fonction plot pour tracer un réseau SIRS.'''
 
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
 
-def plot(n=100, d=3, p=0.1, turns=7, density=0.2, graph=None, verbose=False):
-	'''Affiche un graphe de modèle SIR après un nombre défini de tours
+def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=False):
+	'''Trace un graphe du modèle SIRS après un nombre défini de tours.
 
 		n (int): nombre de personnes
-		d (int): duration de l'infection en tours
+		d[0] (int): duration de l'infection en tours
+		d[1] (int): duration de l'immunité en tours
 		p (float): probabilité d'infection
 		turns (int): nombre de tours à simuler
 		density (float): probabilité que deux noeuds soient connectés
@@ -21,10 +22,13 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, graph=None, verbose=False):
 	if graph is None:
 		people = list(range(n))
 		graph = nx.DiGraph()
-		# state = 0=S et 1=I, age = nombre de tours infecté
-		graph.add_nodes_from(people, state=0, age=0)
+		# state = 0=S, 1=I, 2=R, age = nombre de tours infecte, infections = nombre de cycle d'infection
+		graph.add_nodes_from(people, state=0, age=0, infections=0)
+
+		# Création de connections aléatoires
 		for i in people:
 			for j in people:
+				# La probabilité 0.1 génère de jolis graphes, pas trop liés
 				if i != j and rand.random() < density:
 					# color = 0 neutre, 1 tentative d'infection, 2 infection transmise
 					# vector = 0.01 simple connection, 0.05 si essai de transmission,  1 sinon: sert dans l'affichage en ressorts
@@ -45,46 +49,66 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, graph=None, verbose=False):
 	# On infecte un patient zero en on l'affiche
 	graph.node[rand.randint(0, n - 1)]['state'] = 1
 	if verbose:
-		print("z -", [t[0] for t in graph.nodes(data=True) if t[1]['state']][0])
+		print("z", [t[0] for t in graph.nodes(data=True) if t[1]['state']][0])
 
-	# Pour le tracage du graphe des infectés et retirés
+	# On retient le nombre d'infectés et de retirés à chaque tour
 	infected = [1]
 	removed = [0]
 
 	for m in range(turns):
-		# On compte dynamiquement les infectés et retirés afin de ne pas multiplier les boucles
+		# Afin d'éviter de faire une boucle de comptage, on compte les infectés et retirés au fur et à mesure
 		counter = 0
-		# On accumule les retirés
-		remcounter = removed[-1]
-		# Evite de traiter les patients infectés le tour meme: on filtre dès le début
-		for node in [k for k in graph.nodes(data=True) if k[1]['state'] == 1]:
-			counter += 1
-			if node[1]['age'] < d:
-				node[1]['age'] += 1
-				for other in graph[node[0]]:
-					if not graph.node[other]['state']:
-						if rand.random() < p:
-							# On enregistre les informations comme étant infecté
-							graph.node[other]['state'] = 1
-							graph.edge[node[0]][other]['color'] = 2
-							graph.edge[node[0]][other]['vector'] = 1
-							# On compte le nouvel infecté
-							counter += 1
-							if verbose:
-								print(m, "-", node[0], "i", other)
-						else:
-							graph.edge[node[0]][other]['color'] = 1
-							graph.edge[node[0]][other]['vector'] = 0.05
-							if verbose:
-								print(m, "-", node[0], "t", other)
-			elif node[1]['age'] >= d:
-				# On l'a compté en trop
-				counter -= 1
-				remcounter += 1
-				node[1]['state'] = 2
-				if verbose:
-					print(m, "-", node[0], "d")
-		# On enregistre ce qu'on a compté
+		remcounter = 0
+		# Evite de traiter des patient infectés dès ce tour-ci
+		for node in [k for k in graph.nodes(data=True) if k[1]['state'] >= 1]:
+			# On ne s'interesse qu'aux patients infectés
+			if node[1]['state'] == 1:
+				counter += 1
+				if node[1]['age'] < d[0]:
+					node[1]['age'] += 1
+					for other in graph[node[0]]:
+						# Si l'autre est dans l'état S
+						if not graph.node[other]['state']:
+							if rand.random() < p:
+								# On met les stats au mode infecté
+								graph.node[other]['state'] = 1
+								graph.node[other]['age'] = 0 # par sureté (non nécessaire)
+								graph.node[other]['infections'] += 1
+
+								# De plus, on le compte
+								counter += 1
+
+								# Pour la coloration
+								graph.edge[node[0]][other]['color'] = 2
+								# Servira de ressort dans le graphe
+								graph.edge[node[0]][other]['vector'] = 1
+								if verbose:
+									print(m, node[0], "i", other)
+							else:
+								graph.edge[node[0]][other]['color'] = 1
+								graph.edge[node[0]][other]['vector'] = 0.05
+								if verbose:
+									print(m, node[0], "t", other)
+				else:
+					# En fin de compte, il n'est pas infecté, mais retiré
+					counter -= 1
+					remcounter += 1
+
+					# Passage en mode retiré
+					node[1]['state'] = 2
+					node[1]['age'] = 0
+					if verbose:
+						print(m, node[0], "r")
+			elif node[1]['state'] == 2:
+				if node[1]['age'] < d[1]:
+					# On ne compte que celles qu'on ne va pas retirer
+					remcounter += 1
+					node[1]['age'] += 1
+				else:
+					# Remise à zero des statistiques
+					node[1]['state'] = 0
+					node[1]['age'] = 0
+		# On enregistre succesivement les valeurs pour les tracer plus tard
 		infected.append(counter)
 		removed.append(remcounter)
 
@@ -115,7 +139,6 @@ def plot(n=100, d=3, p=0.1, turns=7, density=0.2, graph=None, verbose=False):
 	mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
 	mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
-	# Seconde subplot pour les infectés et retirés
 	mtpl.pyplot.subplot(1, 2, 2)
 	mtpl.pyplot.title("Infectés et retirés en fonction du tour")
 	mtpl.pyplot.xlabel("Tour")
