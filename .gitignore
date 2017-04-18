@@ -1,0 +1,5 @@
+.vscode/
+*.pyc
+epidemics/.ipynb_checkpoints/
+tags
+epidemics/animate/
