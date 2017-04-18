@@ -107,13 +107,14 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 		removed.append(remcounter)
 
 	mtpl.pyplot.figure(num=1, figsize=(15, 6))
-	mtpl.pyplot.subplot(1, 2, 1)
-
+	with sb.axes_style('dark'):
+		mtpl.pyplot.subplot(1, 2, 1)
 	pos = nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph))
 
-	xa = np.array([x for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
-	ya = np.array([x for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
-	sb.kdeplot(xa, ya, shade=True, color='g', legend=False, shade_lowest=False)
+	xa = np.array([x[0] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
+	ya = np.array([x[1] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
+	if xa.size > 0:
+		sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
 
 	nx.draw_networkx(
 				graph,
@@ -139,7 +140,8 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 	mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
 	mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
-	mtpl.pyplot.subplot(1, 2, 2)
+	with sb.axes_style('darkgrid'):
+		mtpl.pyplot.subplot(1, 2, 2)
 	mtpl.pyplot.title("Infectés et retirés en fonction du tour")
 	mtpl.pyplot.xlabel("Tour")
 	mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))

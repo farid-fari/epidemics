@@ -1,12 +1,12 @@
 # Epidemics
 
-Etude de réseaux aléatoires selon les modèles d'arbre, `SIR`, `SIS` et `SIRS`. Permet d'avoir la représentation graphique de l'état du réseau après un nombre fini de tours.
+Etude de réseaux aléatoires selon les modèles d'arbre, `SIR`, `SIS` et `SIRS`. Permet d'avoir la représentation graphique de l'état du réseau après un nombre fini de tours, ainsi qu'une animation.
 
 Inspiré de [*Networks, Crowds and Markets*](https://www.cs.cornell.edu/home/kleinber/networks-book/) de **David Easley** et **Jon Kleinberg**.
 
 ## Exemple
 
-Exemple de résultat obtenu avec `sirs.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=50, density=0.3`:
+Exemple de résultat obtenu avec `sirs_heat.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=100, density=0.3`:
 
 ![example](epidemics/example_SIR.png?raw=true)
 
