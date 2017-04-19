@@ -10,6 +10,10 @@ Exemple de résultat obtenu avec `sirs_heat.py` pour paramètres `n=60, d=[4, 2]
 
 ![example](epidemics/example_SIR.png?raw=true)
 
+# Trajectométrie
+
+Une étude des déplacements dans l'objectif de faire une étude sur le comportement d'épidémies dans une population.
+
 # Social
 
 Une librairie permettant l'étude d'un réseau de participants consommant deux produits et interagissant en s'influencant réciproquement.
