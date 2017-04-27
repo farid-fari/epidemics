@@ -7,8 +7,11 @@ nouveau = sq.connect('trajecto_nouv.db')
 ca = ancien.cursor()
 cn = nouveau.cursor()
 
-cn.execute("CREATE TABLE Personnes (cle BIGINT PRIMARY KEY, secteur INTEGER, age INTEGER, redressement FLOAT, occupation INTEGER)")
-cn.execute("CREATE TABLE Positions (id INTEGER PRIMARY KEY AUTOINCREMENT, cle BIGINT, heure INTEGER, endroit INTEGER, FOREIGN KEY(cle) REFERENCES Personnes(cle))")
+try:
+    cn.execute("CREATE TABLE Personnes (cle BIGINT PRIMARY KEY, secteur INTEGER, age INTEGER, redressement FLOAT, occupation INTEGER)")
+    cn.execute("CREATE TABLE Positions (id INTEGER PRIMARY KEY AUTOINCREMENT, cle BIGINT, heure INTEGER, endroit INTEGER, FOREIGN KEY(cle) REFERENCES Personnes(cle))")
+except sq.OperationalError:
+    raise FileExistsError("Les tables de données convertie existe déja.")
 
 for k in ca.execute("SELECT * FROM donnees"):
     cn.execute("INSERT INTO Personnes (cle, secteur, age, redressement, occupation) VALUES (?,?,?,?,?)", (k[0], k[1], k[2], k[3], k[4]))
