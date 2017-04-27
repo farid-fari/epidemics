@@ -26,10 +26,10 @@ class Person:
         self.age = int(data[2])
         self.redressement = float(data[3])
         self.occupation = int(data[4])
-        pos = []
-        for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY heure ASC", (self.cle,)):
-            pos.append(h[0])
-        self.positions = pos[5:]
+        self.positions = []
+        # On récupére les 96 horaires et positions
+        for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY heure ASC LIMIT 100", (self.cle,)):
+            self.positions.append(h[0])
 
     def __str__(self):
         return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur) + "\npositions=" + str(self.positions)
