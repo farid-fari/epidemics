@@ -46,20 +46,17 @@ for _, person in sect.people.items():
     for heure, endroit in enumerate(person.positions):
         data[MAP.index(endroit)][heure] += dp
 
-mask = np.zeros((98, 96), dtype=bool)
-for (i, j), v in np.ndenumerate(data):
-    if v == 0:
-        mask[i][j] = True
-
 plt.figure(num=1, figsize=(15, 6))
 plt.subplot(1, 2, 1)
 
-sb.heatmap(data, xticklabels=times_labels, yticklabels=map_labels, cmap=mtpl.cm.get_cmap(name="YlOrRd"), mask=mask)
+plt.title("Répartition de la population du secteur " + str(secteur))
+sb.heatmap(data, xticklabels=times_labels, yticklabels=map_labels, cmap=mtpl.cm.get_cmap(name="YlOrRd"), mask=(data == 0))
+plt.yticks(rotation=0)
 
 plt.subplot(1, 2, 2)
 
+plt.title("Proportion de la population du secteur " + str(secteur) + " présent dans son secteur")
 plt.plot(TIMES, data[MAP.index(secteur)])
-plt.xticks(TIMES, times_labels)
 
 plt.show()
 
