@@ -24,4 +24,6 @@ Basé sur [Competitive Diffusion in Social Networks: Quality or Seeding?](https:
 
 # Dépendances
 
-Le code est écrit pour **Python 3.6**. Il est nécessaire d'installer les librairies `networkx`, `matplotlib` et `scipy` afin de pouvoir éxecuter les scripts Python.
+Le code est écrit pour **Python 3.6.1**. Il est nécessaire d'installer les librairies `networkx`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
+
+La partie trajectométrie requiert la présence de `trajecto.db`, une base de données contenant des informations selon un format décrit dans `convert.py`.
