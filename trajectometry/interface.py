@@ -36,9 +36,12 @@ class Person:
 
 class Secteur:
     '''Gère un secteur entier composé de Persons.'''
-    def __init__(self, cursor, secteur=101):
+    def __init__(self, cursor, secteur=101, verbose=True):
         '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
-           secteur (int): le numéro de secteur à indexer'''
+           secteur (int): le numéro de secteur à indexer
+           verbose (bool) s'il faut notifier du chargement'''
+        if verbose:
+            print("Chargement du secteur", secteur, "...")
         cursor.execute("SELECT * FROM Personnes WHERE secteur = ?", (secteur,))
         self.code = secteur
         self.people = {}

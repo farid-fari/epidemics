@@ -7,7 +7,7 @@ import matplotlib as mtpl
 import matplotlib.pyplot as plt
 from interface import Secteur
 
-secteur = 101
+secteur = 102
 
 MAP = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120,
        121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
@@ -46,17 +46,20 @@ for _, person in sect.people.items():
     for heure, endroit in enumerate(person.positions):
         data[MAP.index(endroit)][heure] += dp
 
+data = np.ma.masked_equal(data, 0)
+data[MAP.index(secteur)].mask = np.ones(96, dtype=bool)
+
 plt.figure(num=1, figsize=(15, 6))
 plt.subplot(1, 2, 1)
 
 plt.title("Répartition de la population du secteur " + str(secteur))
-sb.heatmap(data, xticklabels=times_labels, yticklabels=map_labels, cmap=mtpl.cm.get_cmap(name="YlOrRd"), mask=(data == 0))
+sb.heatmap(np.ma.filled(data, 0), xticklabels=times_labels, yticklabels=map_labels, mask=data.mask, cmap=mtpl.cm.get_cmap(name="YlOrRd"))
 plt.yticks(rotation=0)
 
 plt.subplot(1, 2, 2)
 
 plt.title("Proportion de la population du secteur " + str(secteur) + " présent dans son secteur")
-plt.plot(TIMES, data[MAP.index(secteur)])
+plt.plot(TIMES, data.data[MAP.index(secteur)])
 
 plt.show()
 
