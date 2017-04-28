@@ -1,0 +1,7 @@
+.vscode/
+*.pyc
+epidemics/.ipynb_checkpoints/
+tags
+epidemics/animate/
+trajectometry/trajecto.db
+trajectometry/trajecto_nouv.db

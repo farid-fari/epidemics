@@ -26,39 +26,31 @@ def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, graph=
 	c.execute('CREATE TABLE Statistics (SimId integer, Turn integer, Infected integer, Removed integer)')
 	# La base de données permet le calcul rapide et efficace de moyennes sur un grand nombre de tours et de graphes
 
-	# On fait les arrangements nécessaires au graphe pour ne pas les refaire à chaque tour
+	# On initialise le nombre de personnes
 	if not graph is None:
 		n = graph.number_of_nodes()
-		# On initialise les attributs
-		for node in graph.nodes(data=True):
-			node[1]['state'] = 0
-			node[1]['age'] = 0
-		for edge in graph.edges(data=True):
-			edge[2]['color'] = 0
 
 	# Voir sirs.py pour des commentaires détaillés
-	people = list(range(n))
 	for k in list(range(sample)):
-
 		if verbose:
 			print(k)
 
 		if graph is None:
-			g = nx.DiGraph()
-			# Inutile ici de gérer le nombre d'infections par patient
-			g.add_nodes_from(people, state=0, age=0)
-
-			for i in people:
-				for j in people:
-					if i != j and rand.random() < density:
-						# Inutile de gérer les couleurs
-						g.add_edge(i, j)
+			g = nx.gnp_random_graph(n, density, directed=True)
 		else:
 			g = graph
 
+		# On initialise les attributs
+		for node in g.nodes(data=True):
+			node[1]['state'] = 0
+			node[1]['age'] = 0
+		for edge in g.edges(data=True):
+			edge[2]['color'] = 0
+			if edge[0] == edge[1]:
+				g.remove_edge(edge)
+
 		g.node[rand.randint(0, n - 1)]['state'] = 1
 		# Plutot que de compter dans des tableaux, on ajoutera directement les chiffres à la BDD
-
 		for m in range(turns):
 			counter = 0
 			remcounter = 0

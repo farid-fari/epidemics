@@ -6,6 +6,8 @@ import random as rand
 import networkx as nx
 import matplotlib.pyplot
 import matplotlib as mtpl
+import seaborn as sb
+import numpy as np
 
 def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=False):
 	'''Trace un graphe du modèle SIRS après un nombre défini de tours.
@@ -105,11 +107,18 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 		removed.append(remcounter)
 
 	mtpl.pyplot.figure(num=1, figsize=(15, 6))
-	mtpl.pyplot.subplot(1, 2, 1)
+	with sb.axes_style('dark'):
+		mtpl.pyplot.subplot(1, 2, 1)
+	pos = nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph))
+
+	xa = np.array([x[0] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
+	ya = np.array([x[1] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
+	if xa.size > 0:
+		sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
 
 	nx.draw_networkx(
 				graph,
-				pos=nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph)),
+				pos=pos,
 				with_labels=verbose,
 				arrows=False,
 				node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
@@ -131,10 +140,10 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 	mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
 	mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
-	mtpl.pyplot.subplot(1, 2, 2)
+	with sb.axes_style('darkgrid'):
+		mtpl.pyplot.subplot(1, 2, 2)
 	mtpl.pyplot.title("Infectés et retirés en fonction du tour")
 	mtpl.pyplot.xlabel("Tour")
-	mtpl.pyplot.grid()
 	mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))
 	mtpl.pyplot.bar(list(range(turns + 1)), removed, color=(13/255, 8/255, 135/255))
 
