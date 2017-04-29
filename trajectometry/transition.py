@@ -4,14 +4,14 @@ import sqlite3 as sq
 import numpy as np
 from interface import Secteur, MAP, TIMES
 
-def passage(sect, tf, ti=None, memo=None):
+def passage(sect, tf, ti=None, memo=None, verbose=False):
     '''Rend M(tf|ti) pour un secteur donné.
 
     tf (int): le temps final
     tf (int): le temps initial
     sect (int): le secteur en question
-
     memo (interface.Secteur): un secteur déjà chargé
+    verbose (bool): si l'on doit afficher les temps intermédiaires
 
     return: M(tf|ti) (np.ndarray)'''
 
@@ -38,7 +38,9 @@ def passage(sect, tf, ti=None, memo=None):
         nextt = 0
     else:
         nextt = ot + 1
-    print(TIMES[ot], TIMES[nextt])
+    # On affiche les temps
+    if verbose:
+        print(TIMES[ot], "->", TIMES[nextt])
 
     # Mémoisation: on ne charge le secteur que s'il n'a jamais été chargé
     if memo is None:
@@ -69,6 +71,7 @@ def passage(sect, tf, ti=None, memo=None):
             # On divise la colonne par le nombre de personnes y ayant contribué
             m[:, i] /= posinit[i]
 
+    # On procède par récurrence
     if nt - ot == 0:
         return np.identity(98), (posinit, posinit)
     if nt - ot == 1:
@@ -79,7 +82,7 @@ def passage(sect, tf, ti=None, memo=None):
 
 if __name__ == "__main__":
     # On affiche la matrice partielle pour du deboggage
-    mt, (ini, fin) = passage(103, 2045, 2000)
+    mt, (ini, fin) = passage(102, 2100, 2000, verbose=True)
     print(mt)
     # On vérifie la justesse
-    print(np.array_equal(fin, np.dot(mt, ini)))
+    print(np.allclose(fin, np.dot(mt, ini)))
