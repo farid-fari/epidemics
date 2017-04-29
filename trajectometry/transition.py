@@ -4,29 +4,60 @@ import sqlite3 as sq
 import numpy as np
 from interface import Secteur, MAP, TIMES
 
-def passage(t, sect):
-    '''Rend M(t+1|t) pour un secteur donné.
+def passage(sect, tf, ti=None, memo=None):
+    '''Rend M(tf|ti) pour un secteur donné.
 
-    t (int): le temps initial
+    tf (int): le temps final
+    tf (int): le temps initial
     sect (int): le secteur en question
 
-    return: M(t+1|t) (np.ndarray)'''
-    conn = sq.connect('trajecto_nouv.db')
-    curs = conn.cursor()
-    secteur = Secteur(curs, sect)
+    memo (interface.Secteur): un secteur déjà chargé
+
+    return: M(tf|ti) (np.ndarray)'''
 
     try:
-        ot = TIMES.index(t)
-    except IndexError:
-        raise IndexError('Temps inexistant.')
+        nt = TIMES.index(tf)
+    except ValueError:
+        # L'instant doit figurer sous la forme HHMM dans le tableau TIMES
+        raise IndexError('Temps final inexistant.')
+    try:
+        if ti is None:
+            if nt > 0:
+                ot = nt - 1
+            else:
+                ot = len(TIMES) - 1
+        else:
+            ot = TIMES.index(ti)
+    except ValueError:
+        # L'instant doit figurer sous la forme HHMM dans le tableau TIMES
+        raise IndexError('Temps initial inexistant.')
 
+    # Temps ti+1
+    if ot == len(TIMES) - 1:
+        # On fait le tour car on a atteint la fin
+        nextt = 0
+    else:
+        nextt = ot + 1
+    print(TIMES[ot], TIMES[nextt])
+
+    # Mémoisation: on ne charge le secteur que s'il n'a jamais été chargé
+    if memo is None:
+        conn = sq.connect('trajecto_nouv.db')
+        curs = conn.cursor()
+        secteur = Secteur(curs, sect)
+        curs.close()
+        conn.close()
+    else:
+        secteur = memo
+
+    # On calculera d'abord M(ti+1|ti) ainsi que P(ti) et P(ti+1)
     m = np.zeros((98, 98))
     posinit = np.zeros(98)
     posfin = np.zeros(98)
 
-    # Curseur auxiliaire
-    for _, personne in secteur.people.items():
-        depl = personne.positions[ot:ot+2]
+    # Pour chaque personne on ajoute 1 aux bonnes cases
+    for _, personne in secteur:
+        depl = (personne.positions[ot], personne.positions[nextt])
         depl = [MAP.index(d) for d in depl]
 
         posinit[depl[0]] += 1
@@ -37,9 +68,18 @@ def passage(t, sect):
         if posinit[i]:
             # On divise la colonne par le nombre de personnes y ayant contribué
             m[:, i] /= posinit[i]
-    curs.close()
-    conn.close()
-    return m
+
+    if nt - ot == 0:
+        return np.identity(98), (posinit, posinit)
+    if nt - ot == 1:
+        return m, (posinit, posfin)
+    else:
+        x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur)
+        return np.dot(x, m), (posinit, y)
 
 if __name__ == "__main__":
-    print(passage(0, 101))
+    # On affiche la matrice partielle pour du deboggage
+    mt, (ini, fin) = passage(103, 2045, 2000)
+    print(mt)
+    # On vérifie la justesse
+    print(np.array_equal(fin, np.dot(mt, ini)))

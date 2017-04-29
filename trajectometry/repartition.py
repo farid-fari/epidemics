@@ -29,7 +29,7 @@ sect = Secteur(curs, secteur)
 
 data = np.zeros((98, 96))
 dp = 1 / sect.nombre
-for _, person in sect.people.items():
+for _, person in sect:
     for heure, endroit in enumerate(person.positions):
         data[MAP.index(endroit)][heure] += dp
 

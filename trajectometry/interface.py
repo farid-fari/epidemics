@@ -5,6 +5,7 @@ Définit la classe Person qui décrit une ligne de la base de données.'''
 import sqlite3 as sq
 import warnings
 
+# Tableaux de correspondance entre indexs utilisés et valeurs dans la BDD
 MAP = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120,
        121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
        141, 142, 143, 201, 202, 203, 204, 205, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312,
@@ -21,26 +22,32 @@ TIMES = [0, 15, 30, 45, 100, 115, 130, 145, 200, 215, 230, 245, 300, 315, 330, 3
 class Person:
     ''' Crée un objet Person facilement manipulable en lisant la base de données
         donnée par cursor afin de récupérer la clé demandée.'''
+
     def __init__(self, cursor, cle=None):
         '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
            cle (int/str): la clé de la personne en question'''
         if cle is None:
+            # On prend une personne arbitraire
             cursor.execute("SELECT * FROM Personnes LIMIT 1")
         else:
             cursor.execute("SELECT * FROM Personnes WHERE cle = ? LIMIT 1", (str(cle),))
         data = cursor.fetchone()
+
         if data is None:
-            raise LookupError
+            raise LookupError("Entrée introuvable.")
+
         # On profite des entiers de taille arbitraire, BIGINT en SQL
         self.cle = int(data[0])
         if not cle is None and self.cle != cle:
-            warnings.warn("La clé ne correspond pas à celle spécifiée.")
+            warnings.warn("La clé récupérée ne correspond pas à celle spécifiée.")
+
         self.secteur = int(data[1])
         self.age = int(data[2])
         self.redressement = float(data[3])
         self.occupation = int(data[4])
+
         self.positions = []
-        # On récupére les 96 horaires et positions
+        # On récupére les 96 horaires et positions associées dans l'ordre
         for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY heure ASC LIMIT 100", (self.cle,)):
             self.positions.append(h[0])
 
@@ -48,11 +55,12 @@ class Person:
         return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur) + "\npositions=" + str(self.positions)
 
 class Secteur:
-    '''Gère un secteur entier composé de Persons.'''
+    '''Charget et gère un secteur entier composé de Persons.'''
+
     def __init__(self, cursor, secteur=101, verbose=True):
         '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
            secteur (int): le numéro de secteur à indexer
-           verbose (bool) s'il faut notifier du chargement'''
+           verbose (bool): s'il faut imprimer le message de chargement'''
         if verbose:
             print("Chargement du secteur", secteur, "...")
         cursor.execute("SELECT * FROM Personnes WHERE secteur = ?", (secteur,))
@@ -61,6 +69,10 @@ class Secteur:
         for k in cursor.fetchall():
             self.people[k[0]] = Person(cursor, k[0])
         self.nombre = len(self.people)
+
+    # Permet de faire des 'for x in secteur:'
+    def __iter__(self):
+        return iter(self.people.items())
 
     def __str__(self):
         return "code=" + str(self.code) + "\nnombre=" + str(self.nombre)
