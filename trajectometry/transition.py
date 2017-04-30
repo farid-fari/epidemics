@@ -1,4 +1,6 @@
-''' Construit la matrice de transition d'un état à un autre. '''
+'''Construit la matrice de transition d'un état à un autre.
+
+Introduit la fonction passage pour calculer cette matrice.'''
 
 import sqlite3 as sq
 import numpy as np
@@ -77,7 +79,7 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
     if nt - ot == 1:
         return m, (posinit, posfin)
     else:
-        x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur)
+        x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur, verbose=verbose)
         return np.dot(x, m), (posinit, y)
 
 if __name__ == "__main__":
