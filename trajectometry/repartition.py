@@ -38,15 +38,17 @@ def plot(secteur):
     data[MAP.index(secteur)].mask = np.ones(96, dtype=bool)
 
     plt.figure(num=1, figsize=(15, 6))
-    plt.subplot(1, 2, 1)
+    with sb.axes_style('dark'):
+        plt.subplot(1, 2, 1)
 
     plt.title("Répartition de la population du secteur " + str(secteur))
     sb.heatmap(np.ma.filled(data, 0), xticklabels=times_labels, yticklabels=map_labels, mask=data.mask, cmap=mtpl.cm.get_cmap(name="YlOrRd"))
     plt.yticks(rotation=0)
 
-    plt.subplot(1, 2, 2)
+    with sb.axes_style('darkgrid'):
+        plt.subplot(1, 2, 2)
 
-    plt.title("Proportion de la population du secteur " + str(secteur) + " présent dans son secteur")
+    plt.title("Proportion de la population du secteur " + str(secteur) + " présente dans son secteur")
     plt.plot(TIMES, data.data[MAP.index(secteur)])
 
     plt.show()
