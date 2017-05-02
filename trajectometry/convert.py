@@ -13,8 +13,11 @@ try:
 except sq.OperationalError:
     raise FileExistsError("Les tables de données convertie existe déja.")
 
-for k in ca.execute("SELECT * FROM donnees"):
+# On prendra garde aux lignes nulles causées par la conversion CSV->SQL
+for k in ca.execute("SELECT * FROM donnees WHERE cle IS NOT NULL"):
+    # On insère d'abord la personne afin de vérifier la FOREIGN KEY
     cn.execute("INSERT INTO Personnes (cle, secteur, age, redressement, occupation) VALUES (?,?,?,?,?)", (k[0], k[1], k[2], k[3], k[4]))
+    # Ce sont les noms de colonnes des heures
     heures = [int(x[0]) for x in ca.description[5:]]
     for i, j in enumerate(k[5:]):
         cn.execute("INSERT INTO Positions (cle, heure, endroit) VALUES (?,?,?)", (k[0], heures[i], j))
