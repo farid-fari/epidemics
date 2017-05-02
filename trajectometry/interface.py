@@ -64,7 +64,7 @@ class Person:
         return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur) + "\npositions=" + str(self.positions)
 
 class Secteur:
-    '''Charget et gère un secteur entier composé de Persons.'''
+    '''Charge et gère un secteur entier composé de Persons.'''
 
     def __init__(self, secteur, cursor=None, verbose=True):
         '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
@@ -98,6 +98,5 @@ if __name__ == "__main__":
 
     print("---")
 
-    # Peut prendre un bout de temps
     s = Secteur(101)
     print(s)
