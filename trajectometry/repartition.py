@@ -2,7 +2,6 @@
 
 Introduit la fonction plot qui trace cette répartition.'''
 
-import sqlite3 as sq
 import seaborn as sb
 import numpy as np
 import matplotlib as mtpl
@@ -23,10 +22,7 @@ def plot(secteur):
             "19", "", "", "", "20", "", "", "", "21", "", "", "", "22", "", "", "",
             "23", "", "", "",]
 
-    conn = sq.connect('trajecto_nouv.db')
-    curs = conn.cursor()
-
-    sect = Secteur(curs, secteur)
+    sect = Secteur(secteur)
 
     data = np.zeros((98, 96))
     dp = 1 / sect.nombre
@@ -52,9 +48,6 @@ def plot(secteur):
     plt.plot(TIMES, data.data[MAP.index(secteur)])
 
     plt.show()
-
-    curs.close()
-    conn.close()
 
 if __name__ == "__main__":
     plot(102)

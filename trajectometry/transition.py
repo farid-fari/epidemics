@@ -2,7 +2,6 @@
 
 Introduit la fonction passage pour calculer cette matrice.'''
 
-import sqlite3 as sq
 import numpy as np
 from interface import Secteur, MAP, TIMES
 
@@ -46,11 +45,7 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
 
     # Mémoisation: on ne charge le secteur que s'il n'a jamais été chargé
     if memo is None:
-        conn = sq.connect('trajecto_nouv.db')
-        curs = conn.cursor()
-        secteur = Secteur(curs, sect)
-        curs.close()
-        conn.close()
+        secteur = Secteur(sect)
     else:
         secteur = memo
 

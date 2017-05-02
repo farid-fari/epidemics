@@ -23,9 +23,14 @@ class Person:
     ''' Crée un objet Person facilement manipulable en lisant la base de données
         donnée par cursor afin de récupérer la clé demandée.'''
 
-    def __init__(self, cursor, cle=None):
+    def __init__(self, cle=None, cursor=None):
         '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
            cle (int/str): la clé de la personne en question'''
+        closeconn = False
+        if cursor is None:
+            conn = sq.connect('trajecto_nouv.db')
+            cursor = conn.cursor()
+            closeconn = True
         if cle is None:
             # On prend une personne arbitraire
             cursor.execute("SELECT * FROM Personnes LIMIT 1")
@@ -51,24 +56,34 @@ class Person:
         for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY heure ASC LIMIT 100", (self.cle,)):
             self.positions.append(h[0])
 
+        if closeconn:
+            cursor.close()
+            conn.close()
+
     def __str__(self):
         return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur) + "\npositions=" + str(self.positions)
 
 class Secteur:
     '''Charget et gère un secteur entier composé de Persons.'''
 
-    def __init__(self, cursor, secteur=101, verbose=True):
+    def __init__(self, secteur, cursor=None, verbose=True):
         '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
            secteur (int): le numéro de secteur à indexer
            verbose (bool): s'il faut imprimer le message de chargement'''
+        if cursor is None:
+            conn = sq.connect('trajecto_nouv.db')
+            cursor = conn.cursor()
         if verbose:
             print("Chargement du secteur", secteur, "...")
         cursor.execute("SELECT * FROM Personnes WHERE secteur = ?", (secteur,))
         self.code = secteur
         self.people = {}
         for k in cursor.fetchall():
-            self.people[k[0]] = Person(cursor, k[0])
+            self.people[int(k[0])] = Person(k[0], cursor)
         self.nombre = len(self.people)
+
+        cursor.close()
+        conn.close()
 
     # Permet de faire des 'for x in secteur:'
     def __iter__(self):
@@ -78,15 +93,11 @@ class Secteur:
         return "code=" + str(self.code) + "\nnombre=" + str(self.nombre)
 
 if __name__ == "__main__":
-    _conn = sq.connect('trajecto_nouv.db')
-    _curs = _conn.cursor()
-    p = Person(_curs)
+    p = Person()
     print(p)
 
     print("---")
 
     # Peut prendre un bout de temps
-    s = Secteur(_curs, 101)
+    s = Secteur(101)
     print(s)
-    _curs.close()
-    _conn.close()
