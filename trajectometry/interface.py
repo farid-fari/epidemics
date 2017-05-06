@@ -28,7 +28,7 @@ class Person:
            cle (int/str): la clé de la personne en question'''
         closeconn = False
         if cursor is None:
-            conn = sq.connect('trajecto_nouv.db')
+            conn = sq.connect('trajecto.db')
             cursor = conn.cursor()
             closeconn = True
         if cle is None:
@@ -71,7 +71,7 @@ class Secteur:
            secteur (int): le numéro de secteur à indexer
            verbose (bool): s'il faut imprimer le message de chargement'''
         if cursor is None:
-            conn = sq.connect('trajecto_nouv.db')
+            conn = sq.connect('trajecto.db')
             cursor = conn.cursor()
         if verbose:
             print("Chargement du secteur", secteur, "...")
