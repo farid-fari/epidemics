@@ -55,7 +55,7 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
     posfin = np.zeros(98)
 
     # Pour chaque personne on ajoute 1 aux bonnes cases
-    for _, personne in secteur:
+    for personne in secteur:
         depl = (personne.positions[ot], personne.positions[nextt])
         depl = [MAP.index(d) for d in depl]
 

@@ -61,33 +61,49 @@ class Person:
             conn.close()
 
     def __str__(self):
-        return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur) + "\npositions=" + str(self.positions)
+        return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur)
 
 class Secteur:
     '''Charge et gère un secteur entier composé de Persons.'''
 
-    def __init__(self, secteur, cursor=None, verbose=True):
-        '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
-           secteur (int): le numéro de secteur à indexer
-           verbose (bool): s'il faut imprimer le message de chargement'''
+    def __init__(self, secteur, cursor=None):
+        '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir (sera fermée)
+           secteur (int): le numéro de secteur à indexer'''
         if cursor is None:
             conn = sq.connect('trajecto.db')
             cursor = conn.cursor()
-        if verbose:
-            print("Chargement du secteur", secteur, "...")
-        cursor.execute("SELECT * FROM Personnes WHERE secteur = ?", (secteur,))
+
+        cursor.execute("SELECT cle FROM Personnes WHERE secteur = ?", (secteur,))
         self.code = secteur
-        self.people = {}
-        for k in cursor.fetchall():
-            self.people[int(k[0])] = Person(k[0], cursor)
+        # Algorithme flemmard: on ne charge que les clés
+        self.keys = [p[0] for p in cursor.fetchall()]
+        self.people = {i: None for i in self.keys}
         self.nombre = len(self.people)
 
         cursor.close()
         conn.close()
 
-    # Permet de faire des 'for x in secteur:'
+    def person(self, cle):
+        '''Charge et rend une personne individuelle associée à une clé.
+
+        cle (int): la clé de la personne recherchée'''
+        if not cle in self.people:
+            raise KeyError('Clé inexistante.')
+        if self.people[cle]:
+            return self.people[cle]
+        else:
+            self.people[cle] = Person(cle)
+            return self.people[cle]
+
+    # Permet de faire des 'for x in secteur:' avec un chargement flemmard
     def __iter__(self):
-        return iter(self.people.items())
+        for i in self.keys:
+            if self.people[i]:
+                yield self.people[i]
+            else:
+                self.people[i] = Person(i)
+                yield self.people[i]
+        raise StopIteration
 
     def __str__(self):
         return "code=" + str(self.code) + "\nnombre=" + str(self.nombre)

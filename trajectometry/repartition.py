@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from interface import Secteur, MAP, TIMES
 
 def plot(secteur):
+    # Permet d'avoir des étiquettes raisonnables dans le graphe final
     map_labels = ["101", "", "", "", "", "", "", "", "", "110", "", "", "", "", "", "", "", "", "", "120",
         "", "", "", "", "", "", "", "", "", "130", "", "", "", "", "", "", "", "", "", "140",
         "", "", "", "201", "", "", "", "", "301", "", "", "", "", "", "", "", "", "310", "", "",
@@ -26,7 +27,7 @@ def plot(secteur):
 
     data = np.zeros((98, 96))
     dp = 1 / sect.nombre
-    for _, person in sect:
+    for person in sect:
         for heure, endroit in enumerate(person.positions):
             data[MAP.index(endroit)][heure] += dp
 
