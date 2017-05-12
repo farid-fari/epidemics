@@ -73,9 +73,9 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
         return np.identity(98), (posinit, posinit)
     if nt - ot == 1:
         return m, (posinit, posfin)
-    else:
-        x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur, verbose=verbose)
-        return np.dot(x, m), (posinit, y)
+    # else
+    x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur, verbose=verbose)
+    return np.dot(x, m), (posinit, y)
 
 if __name__ == "__main__":
     # On affiche la matrice partielle pour du deboggage

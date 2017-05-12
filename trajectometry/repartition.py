@@ -10,18 +10,19 @@ from interface import Secteur, MAP, TIMES
 
 def plot(secteur):
     # Permet d'avoir des étiquettes raisonnables dans le graphe final
-    map_labels = ["101", "", "", "", "", "", "", "", "", "110", "", "", "", "", "", "", "", "", "", "120",
-        "", "", "", "", "", "", "", "", "", "130", "", "", "", "", "", "", "", "", "", "140",
-        "", "", "", "201", "", "", "", "", "301", "", "", "", "", "", "", "", "", "310", "", "",
-        "", "", "401", "", "", "501", "", "", "", "", "", "", "", "", "510", "", "", "", "", "",
-        "", "", "", "", "601", "", "603", "701", "801", "", "", "", "", "", "901", "", "", "990"]
+    map_labels = ["101", "", "", "", "", "", "", "", "", "110", "", "", "", "", "", "", "", "",
+                  "", "120", "", "", "", "", "", "", "", "", "", "130", "", "", "", "", "", "",
+                  "", "", "", "140", "", "", "", "201", "", "", "", "", "301", "", "", "", "",
+                  "", "", "", "", "310", "", "", "", "", "401", "", "", "501", "", "", "", "",
+                  "", "", "", "", "510", "", "", "", "", "", "", "", "", "", "601", "", "603",
+                  "701", "801", "", "", "", "", "", "901", "", "", "990"]
 
-    times_labels = ["00", "", "", "", "01", "", "", "", "02", "", "", "", "03", "", "", "", "04", "", "", "", "05",
-            "", "", "", "06", "", "", "", "07", "", "", "", "08", "", "", "", "09", "", "", "", "10",
-            "", "", "", "11", "", "", "", "12", "", "", "", "13", "", "", "", "14",
-            "", "", "", "15", "", "", "", "16", "", "", "", "17", "", "", "", "18", "", "", "",
-            "19", "", "", "", "20", "", "", "", "21", "", "", "", "22", "", "", "",
-            "23", "", "", "",]
+    times_labels = ["00", "", "", "", "01", "", "", "", "02", "", "", "", "03", "", "", "", "04",
+                    "", "", "", "05", "", "", "", "06", "", "", "", "07", "", "", "", "08", "",
+                    "", "", "09", "", "", "", "10", "", "", "", "11", "", "", "", "12", "", "",
+                    "", "13", "", "", "", "14", "", "", "", "15", "", "", "", "16", "", "", "",
+                    "17", "", "", "", "18", "", "", "", "19", "", "", "", "20", "", "", "", "21",
+                    "", "", "", "22", "", "", "", "23", "", "", "",]
 
     sect = Secteur(secteur)
 
@@ -38,14 +39,15 @@ def plot(secteur):
     with sb.axes_style('dark'):
         plt.subplot(1, 2, 1)
 
-    plt.title("Répartition de la population du secteur " + str(secteur))
-    sb.heatmap(np.ma.filled(data, 0), xticklabels=times_labels, yticklabels=map_labels, mask=data.mask, cmap=mtpl.cm.get_cmap(name="YlOrRd"))
+    plt.title(f"Répartition de la population du secteur {secteur}")
+    sb.heatmap(np.ma.filled(data, 0), xticklabels=times_labels, yticklabels=map_labels,
+               mask=data.mask, cmap=mtpl.cm.get_cmap(name="YlOrRd"))
     plt.yticks(rotation=0)
 
     with sb.axes_style('darkgrid'):
         plt.subplot(1, 2, 2)
 
-    plt.title("Proportion de la population du secteur " + str(secteur) + " présente dans son secteur")
+    plt.title(f"Proportion de la population du secteur {secteur} présente dans son secteur")
     plt.plot(TIMES, data.data[MAP.index(secteur)])
 
     plt.show()
