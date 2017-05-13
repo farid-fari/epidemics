@@ -37,7 +37,7 @@ class Person:
             # On prend une personne arbitraire
             cursor.execute("SELECT * FROM Personnes LIMIT 1")
         else:
-            cursor.execute("SELECT * FROM Personnes WHERE cle = ? LIMIT 1", (str(cle),))
+            cursor.execute("SELECT * FROM Personnes WHERE cle = ? LIMIT 1", (cle,))
         data = cursor.fetchone()
 
         if data is None:
@@ -64,7 +64,7 @@ class Person:
             conn.close()
 
     def __str__(self):
-        return "id=" + str(self.cle) + "\nsecteur=" + str(self.secteur)
+        return f"id={self.cle}\nsecteur={self.secteur}"
 
 class Secteur:
     '''Charge et gère un secteur entier composé de Persons.'''
@@ -105,7 +105,7 @@ class Secteur:
         raise StopIteration
 
     def __str__(self):
-        return "code=" + str(self.code) + "\nnombre=" + str(self.nombre)
+        return f"code={self.code}\nnombre={self.nombre}"
 
 if __name__ == "__main__":
     p = Person()
