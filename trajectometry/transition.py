@@ -12,9 +12,9 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
     tf (int): le temps initial
     sect (int): le secteur en question
     memo (interface.Secteur): un secteur déjà chargé
-    verbose (bool): si l'on doit afficher les temps intermédiaires
+    verbose (bool): si l'on doit afficher les temps chargés
 
-    return: M(tf|ti) (np.ndarray)'''
+    return: M(tf|ti) (np.ndarray), (P(ti), P(tf)) (np.ndarray array)'''
 
     try:
         nt = TIMES.index(tf)
