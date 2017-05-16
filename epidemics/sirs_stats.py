@@ -6,9 +6,9 @@ import random as rand
 import sqlite3 as sq
 import networkx as nx
 import matplotlib.pyplot as plt
+import seaborn as sb
 
-
-def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, graph=None, verbose=False):
+def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=None, verbose=False):
     '''Trace un graphe moyen du modèle SIRS après un nombre défini de tours.
 
         n (int): nombre de personnes
@@ -23,8 +23,10 @@ def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, graph=
     # On crée le tableau en mémoire puisqu'il est temporaire
     connection = sq.connect(':memory:')
     c = connection.cursor()
-    c.execute('CREATE TABLE Statistics (SimId integer, Turn integer, Infected integer, Removed integer)')
-    # La base de données permet le calcul rapide et efficace de moyennes sur un grand nombre de tours et de graphes
+    c.execute('CREATE TABLE Statistics '
+              '(SimId integer, Turn integer, Infected integer, Removed integer)')
+    # La base de données permet le calcul rapide et efficace de moyennes sur
+    # un grand nombre de tours et de graphes
 
     # On initialise le nombre de personnes
     if not graph is None:
@@ -105,13 +107,24 @@ def plot_avg(n=100, d=[4, 2], p=0.05, turns=100, density=0.1, sample=600, graph=
     connection.close()
 
     plt.figure(num=1, figsize=(15, 6))
-    plt.suptitle("Moyenne des infectés et retirés en fonction du tour")
-    plt.title(f"{sample} itérations", style='italic')
+    plt.suptitle(f"Résultats moyens sur {sample} itérations")
+
+    with sb.axes_style('darkgrid'):
+        plt.subplot(1, 2, 1)
+    plt.title("Moyenne des infectés et retirés en fonction du tour")
     plt.xlabel("Tour")
-    plt.grid()
     plt.bar(x, infected, color=(204/255, 71/255, 120/255))
     plt.bar(x, removed, color=(13/255, 8/255, 135/255))
+
+    with sb.axes_style('darkgrid'):
+        plt.subplot(1, 2, 2)
+    plt.title("Portrait de phase moyen du nombre d'infectés")
+    plt.xlabel("Nombre d'infectés")
+    plt.ylabel("Variation du nombre d'infectés")
+    derivI = [0] + [infected[i] - infected[i-1] for i in range(1, len(infected))]
+    plt.plot(infected, derivI, marker="o", color=(204/255, 71/255, 120/255))
+
     plt.show()
 
 if __name__ == "__main__":
-    plot_avg()
+    plot_avg(verbose=True)

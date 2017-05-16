@@ -106,9 +106,9 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
         infected.append(counter)
         removed.append(remcounter)
 
-    mtpl.pyplot.figure(num=1, figsize=(15, 6))
+    mtpl.pyplot.figure(num=1, figsize=(15, 12))
     with sb.axes_style('dark'):
-        mtpl.pyplot.subplot(1, 2, 1)
+        mtpl.pyplot.subplot(2, 2, 1)
     pos = nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph))
 
     xa = np.array([x[0] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
@@ -117,20 +117,20 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
         sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
 
     nx.draw_networkx(
-                graph,
-                pos=pos,
-                with_labels=verbose,
-                arrows=False,
-                node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
-                cmap=mtpl.cm.get_cmap(name="plasma"),
-                vmin=0,
-                vmax=2,
-                edge_color=[2 - t[2]['color'] for t in graph.edges(data=True)],
-                edge_cmap=mtpl.cm.get_cmap(name="gray"),
-                edge_vmin=0,
-                edge_vmax=2.3,
-                node_size=5000/n+200,
-                width=0.2)
+        graph,
+        pos=pos,
+        with_labels=verbose,
+        arrows=False,
+        node_color=[2 - k[1]['state'] for k in graph.nodes(data=True)],
+        cmap=mtpl.cm.get_cmap(name="plasma"),
+        vmin=0,
+        vmax=2,
+        edge_color=[2 - t[2]['color'] for t in graph.edges(data=True)],
+        edge_cmap=mtpl.cm.get_cmap(name="gray"),
+        edge_vmin=0,
+        edge_vmax=2.3,
+        node_size=5000/n+200,
+        width=0.2)
 
     mtpl.pyplot.title("Etat final du réseau")
     mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
@@ -141,13 +141,21 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
     mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
     with sb.axes_style('darkgrid'):
-        mtpl.pyplot.subplot(1, 2, 2)
+        mtpl.pyplot.subplot(2, 2, 2)
     mtpl.pyplot.title("Infectés et retirés en fonction du tour")
     mtpl.pyplot.xlabel("Tour")
     mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))
     mtpl.pyplot.bar(list(range(turns + 1)), removed, color=(13/255, 8/255, 135/255))
 
+    with sb.axes_style('darkgrid'):
+        mtpl.pyplot.subplot(2, 1, 2)
+    mtpl.pyplot.title("Portrait de phase de l'épidémie")
+    mtpl.pyplot.xlabel("Nombre d'infectés")
+    mtpl.pyplot.ylabel("Variation du nombre d'infectés")
+    derivI = [0] + [infected[i] - infected[i-1] for i in range(1, len(infected))]
+    mtpl.pyplot.plot(infected, derivI, marker="o", color=(204/255, 71/255, 120/255))
+
     mtpl.pyplot.show()
 
 if __name__ == "__main__":
-    plot()
+    plot(n=100)
