@@ -6,6 +6,7 @@ import random as rand
 import sqlite3 as sq
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sb
 
 def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=None, verbose=False):
@@ -118,7 +119,8 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=N
 
     with sb.axes_style('darkgrid'):
         plt.subplot(1, 2, 2)
-    plt.title("Portrait de phase moyen du nombre d'infectés")
+    # Nombre dérivé en fonction du nombre
+    plt.title("Portrait de phase du nombre d'infectés moyen")
     plt.xlabel("Nombre d'infectés")
     plt.ylabel("Variation du nombre d'infectés")
     derivI = [0] + [infected[i] - infected[i-1] for i in range(1, len(infected))]

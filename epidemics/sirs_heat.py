@@ -149,6 +149,7 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
 
     with sb.axes_style('darkgrid'):
         mtpl.pyplot.subplot(2, 1, 2)
+    # Nombre dérivé en fonction du nombre
     mtpl.pyplot.title("Portrait de phase de l'épidémie")
     mtpl.pyplot.xlabel("Nombre d'infectés")
     mtpl.pyplot.ylabel("Variation du nombre d'infectés")
