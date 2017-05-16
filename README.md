@@ -6,7 +6,7 @@ Inspiré de [*Networks, Crowds and Markets*](https://www.cs.cornell.edu/home/kle
 
 ## Exemple
 
-Exemple de résultat obtenu avec `sirs_heat.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=100, density=0.3`:
+Exemple de résultat obtenu avec `sirs.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=100, density=0.3`:
 
 ![exemple](epidemics/example_SIR.png?raw=true)
 

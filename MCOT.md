@@ -27,3 +27,5 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 *(ébauche temporaire...)*
 
 [1] - 
+
+NCM - 238,183,44,173,69,52,278,196,213,267,195
