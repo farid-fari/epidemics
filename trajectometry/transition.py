@@ -12,9 +12,9 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
     tf (int): le temps initial
     sect (int): le secteur en question
     memo (interface.Secteur): un secteur déjà chargé
-    verbose (bool): si l'on doit afficher les temps intermédiaires
+    verbose (bool): si l'on doit afficher les temps chargés
 
-    return: M(tf|ti) (np.ndarray)'''
+    return: M(tf|ti) (np.ndarray), (P(ti), P(tf)) (np.ndarray array)'''
 
     try:
         nt = TIMES.index(tf)
@@ -55,7 +55,7 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
     posfin = np.zeros(98)
 
     # Pour chaque personne on ajoute 1 aux bonnes cases
-    for _, personne in secteur:
+    for personne in secteur:
         depl = (personne.positions[ot], personne.positions[nextt])
         depl = [MAP.index(d) for d in depl]
 
@@ -73,9 +73,9 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
         return np.identity(98), (posinit, posinit)
     if nt - ot == 1:
         return m, (posinit, posfin)
-    else:
-        x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur, verbose=verbose)
-        return np.dot(x, m), (posinit, y)
+    # else
+    x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur, verbose=verbose)
+    return np.dot(x, m), (posinit, y)
 
 if __name__ == "__main__":
     # On affiche la matrice partielle pour du deboggage

@@ -6,7 +6,7 @@ Inspiré de [*Networks, Crowds and Markets*](https://www.cs.cornell.edu/home/kle
 
 ## Exemple
 
-Exemple de résultat obtenu avec `sirs_heat.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=100, density=0.3`:
+Exemple de résultat obtenu avec `sirs.py` pour paramètres `n=60, d=[4, 2], p=0.05, turns=100, density=0.3`:
 
 ![exemple](epidemics/example_SIR.png?raw=true)
 
@@ -34,6 +34,6 @@ Basé sur [Competitive Diffusion in Social Networks: Quality or Seeding?](https:
 
 # Dépendances
 
-Le code est écrit pour **Python 3.6.1**. Il est nécessaire d'installer les librairies `networkx`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
+Le code est écrit pour **Python 3.6.1** (au moins **3.6** pour les literal string). Il est nécessaire d'installer les librairies `networkx`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
 
-La partie trajectométrie requiert la présence de `trajecto.db`, une base de données contenant des informations selon un format décrit dans `convert.py`.
+La partie trajectométrie requiert la présence de `trajecto.csv`, une liste de données contenant des informations selon un format décrit dans `convert.py`.
