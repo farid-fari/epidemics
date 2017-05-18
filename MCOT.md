@@ -20,7 +20,7 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 
 ## 4. Objectif(s) du travail
 
-- Etre capable de lister des mesure concrètes pour limiter la propagation (en *prévention* et en *étouffement*) (par exemple, liste des personnes à cibler, ...)
+- Etre capable de lister des mesures concrètes pour limiter la propagation (en *prévention* et en *étouffement*) (par exemple, liste des personnes à cibler, ...)
 - Savoir quels paramètres ont quelle importance dans la propagation (identification éventuelle d'un seuil d'infection, ...)
 
 ## 5. Liste de réferences bibliographiques
