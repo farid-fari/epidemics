@@ -6,7 +6,6 @@ import random as rand
 import sqlite3 as sq
 import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sb
 
 def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=None, verbose=False):
@@ -64,17 +63,15 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=N
                     if node[1]['age'] < d[0]:
                         node[1]['age'] += 1
                         for other in g[node[0]]:
-                            if not g.node[other]['state']:
-                                if rand.random() < p:
-                                    g.node[other]['state'] = 1
-                                    g.node[other]['age'] = 0 # par sureté (non nécessaire)
-                                    # De plus, on le compte (inutile de recolorer l'edge)
-                                    counter += 1
+                            if not g.node[other]['state'] and rand.random() < p:
+                                g.node[other]['state'] = 1
+                                g.node[other]['age'] = 0 # par sureté (non nécessaire)
+                                # De plus, on le compte (inutile de recolorer l'edge)
+                                counter += 1
                     else:
                         # En fin de compte, il n'est pas infecté, mais retiré
                         counter -= 1
                         remcounter += 1
-
                         # Passage en mode retiré
                         node[1]['state'] = 2
                         node[1]['age'] = 0
