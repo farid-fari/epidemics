@@ -1,6 +1,7 @@
 ''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS.
 
-Introduit la fonction plot pour tracer un réseau SIRS.'''
+Introduit la fonction plot pour tracer un réseau SIRS, mais aussi SIR ou SIS avec
+des paramètres bien choisis. '''
 
 import random as rand
 import networkx as nx
@@ -9,20 +10,23 @@ import matplotlib as mtpl
 import seaborn as sb
 import numpy as np
 
-def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=False):
+def plot(n=60, d=[4, 2], p=0.05, turns=100, graph=0.3, verbose=False):
     '''Trace un graphe du modèle SIRS après un nombre défini de tours.
 
         n (int): nombre de personnes
         d[0] (int): duration de l'infection en tours
         d[1] (int): duration de l'immunité en tours
+            s'il vaut 0, on aura un modèle SIS
+            s'il est >= à turns, c'est un modèle SIR
         p (float): probabilité d'infection
         turns (int): nombre de tours à simuler
-        density (float): probabilité que deux noeuds soient connectés
-        graph (nx.Graph): un éventuel graphe imposé
+        graph (nx.Graph ou int ou float): un éventuel graphe imposé,
+            ou bien une densité pour qu'un graphe soit généré
         verbose (bool): si l'on doit afficher les événements'''
 
-    if graph is None:
-        graph = nx.gnp_random_graph(n, density, directed=True)
+    if isinstance(graph, float) or isinstance(graph, int):
+        # On a alors passé une densité pour la génération d'un graphe
+        graph = nx.gnp_random_graph(n, graph, directed=True)
     else:
         # On initialise le nombre de personnes
         n = graph.number_of_nodes()
@@ -37,7 +41,8 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
     for edge in graph.edges(data=True):
         # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
         edge[2]['color'] = 0
-        # vector = 0.01 simple connection, 0.05 si essai de transmission,  1 sinon: sert dans l'affichage en ressorts
+        # vector = 0.01 simple connection, 0.05 si essai de transmission, 1 sinon
+        # sert dans l'affichage en ressorts
         edge[2]['vector'] = 0.01
 
     # On infecte un patient zero en on l'affiche
@@ -50,7 +55,8 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
     removed = [0]
 
     for m in range(turns):
-        # Afin d'éviter de faire une boucle de comptage, on compte les infectés et retirés au fur et à mesure
+        # Afin d'éviter de faire une boucle de comptage,
+        # on compte les infectés et retirés au fur et à mesure
         counter = 0
         remcounter = 0
         # Evite de traiter des patient infectés dès ce tour-ci
@@ -84,15 +90,20 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
                                 if verbose:
                                     print(m, node[0], "t", other)
                 else:
-                    # En fin de compte, il n'est pas infecté, mais retiré
+                    # En fin de compte, il n'est pas infecté, mais retiré/susceptible
                     counter -= 1
-                    remcounter += 1
 
-                    # Passage en mode retiré
-                    node[1]['state'] = 2
-                    node[1]['age'] = 0
-                    if verbose:
-                        print(m, node[0], "r")
+                    if d[1]:
+                        # Passage en mode retiré
+                        node[1]['state'] = 2
+                        node[1]['age'] = 0
+                        if verbose:
+                            print(m, node[0], "r")
+                        remcounter += 1
+                    else:
+                        # Passage en mode susceptible
+                        node[1]['state'] = 0
+                        node[1]['age'] = 0
             elif node[1]['state'] == 2:
                 if node[1]['age'] < d[1]:
                     # On ne compte que celles qu'on ne va pas retirer
@@ -107,13 +118,21 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
         removed.append(remcounter)
 
     mtpl.pyplot.figure(num=1, figsize=(15, 12))
+    mod = "SIS"
+    if d[1]:
+        mod = "SIRS"
+    if d[1] >= turns:
+        mod = "SIR"
+    mtpl.pyplot.suptitle(f"Etat final du modèle {mod} après {turns} tours")
     with sb.axes_style('dark'):
         mtpl.pyplot.subplot(2, 2, 1)
+        mtpl.pyplot.axis("off")
     pos = nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph))
 
     xa = np.array([x[0] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
     ya = np.array([x[1] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
-    if xa.size > 0:
+    # La heatmap a peu d'intéret et est peu stable pour peu de valeurs
+    if xa.size > 2:
         sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
 
     nx.draw_networkx(
@@ -159,4 +178,4 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, graph=None, verbose=Fal
     mtpl.pyplot.show()
 
 if __name__ == "__main__":
-    plot(n=100)
+    plot()

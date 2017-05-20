@@ -1,4 +1,4 @@
-'''Construit un résultat moyen au modèle SIRS pour des paramètres donnés
+'''Construit un résultat moyen au modèle SIRS pour des paramètres donnés.
 
 Introduit la fonction plot_avg pour tracer des statistiques moyennes sur un graphe.'''
 
@@ -8,16 +8,18 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import seaborn as sb
 
-def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=None, verbose=False):
+def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, sample=600, graph=0.3, verbose=False):
     '''Trace un graphe moyen du modèle SIRS après un nombre défini de tours.
 
         n (int): nombre de personnes
         d[0] (int): duration de l'infection en tours
         d[1] (int): duration de l'immunité en tours
+            s'il vaut 0, on aura un modèle SIS
+            s'il est >= à turns, c'est un modèle SIR
         p (float): probabilité d'infection
         turns (int): nombre de tours à simuler
-        graph (nx.Graph): un éventuel graphe imposé
-        density (float): probabilité que deux noeuds soient connectés
+        graph (nx.Graph ou int ou float): un éventuel graphe imposé,
+            ou bien une densité pour qu'un graphe soit généré
         verbose (bool): si l'on doit afficher les tours'''
 
     # On crée le tableau en mémoire puisqu'il est temporaire
@@ -29,16 +31,17 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=N
     # un grand nombre de tours et de graphes
 
     # On initialise le nombre de personnes
-    if not graph is None:
+    if not isinstance(graph, float) and not isinstance(graph, int):
         n = graph.number_of_nodes()
 
     # Voir sirs.py pour des commentaires détaillés
-    for k in list(range(sample)):
+    for k in range(sample):
         if verbose:
             print(k)
 
-        if graph is None:
-            g = nx.gnp_random_graph(n, density, directed=True)
+        if isinstance(graph, float) or isinstance(graph, int):
+            # On a alors passé une densité pour la génération d'un graphe
+            g = nx.gnp_random_graph(n, graph, directed=True)
         else:
             g = graph
 
@@ -69,13 +72,18 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=N
                                 # De plus, on le compte (inutile de recolorer l'edge)
                                 counter += 1
                     else:
-                        # En fin de compte, il n'est pas infecté, mais retiré
+                        # En fin de compte, il n'est pas infecté, mais retiré/susceptible
                         counter -= 1
-                        remcounter += 1
-                        # Passage en mode retiré
-                        node[1]['state'] = 2
-                        node[1]['age'] = 0
 
+                        if d[1]:
+                            # Passage en mode retiré
+                            node[1]['state'] = 2
+                            node[1]['age'] = 0
+                            remcounter += 1
+                        else:
+                            # Passage en mode susceptible
+                            node[1]['state'] = 0
+                            node[1]['age'] = 0
                 elif node[1]['state'] == 2:
                     if node[1]['age'] < d[1]:
                         # On ne compte que celles qu'on ne va pas retirer
@@ -105,7 +113,12 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, density=0.3, sample=600, graph=N
     connection.close()
 
     plt.figure(num=1, figsize=(15, 6))
-    plt.suptitle(f"Résultats moyens sur {sample} itérations")
+    mod = "SIS"
+    if d[1]:
+        mod = "SIRS"
+    if d[1] >= turns:
+        mod = "SIR"
+    plt.suptitle(f"Résultats moyens du modèle {mod} sur {sample} itérations")
 
     with sb.axes_style('darkgrid'):
         plt.subplot(1, 2, 1)
