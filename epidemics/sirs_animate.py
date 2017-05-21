@@ -2,6 +2,7 @@
 
 Introduit la fonction plot pour tracer un réseau SIRS.'''
 
+import os
 import random as rand
 import networkx as nx
 import matplotlib.pyplot
@@ -21,6 +22,8 @@ def animate(n=60, d=[4, 2], p=0.05, turns=100, graph=0.3):
         turns (int): nombre de tours à simuler
         graph (nx.Graph ou int ou float): un éventuel graphe imposé,
             ou bien une densité pour qu'un graphe soit généré'''
+    if not os.path.exists('animate'):
+        os.mkdir('animate')
 
     if isinstance(graph, float) or isinstance(graph, int):
         # On a alors passé une densité pour la génération d'un graphe
@@ -128,9 +131,13 @@ def animate(n=60, d=[4, 2], p=0.05, turns=100, graph=0.3):
         print(m)
 
 if __name__ == "__main__":
-    import os
+    import subprocess
     animate()
-    if os.path.exists('animate/convert.bat'):
-        os.chdir('animate')
-        os.system('@ECHO off')
-        os.system('convert.bat')
+    os.chdir('animate') # crée par la fonction
+    if os.path.exists('final.mkv'):
+        os.unlink('final.mkv')
+    try:
+        subprocess.run(['ffmpeg', '-r', '8', '-i', '%d.png', 'final.mkv'])
+        subprocess.run(['vlc', 'final.mkv'])
+    except subprocess.CalledProcessError:
+        raise ProcessLookupError('ffmpeg ou vlc manquant')
