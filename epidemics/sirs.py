@@ -126,9 +126,11 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, graph=0.3, verbose=False):
     mtpl.pyplot.suptitle(f"Etat final du modèle {mod} après {turns} tours")
     with sb.axes_style('dark'):
         mtpl.pyplot.subplot(2, 2, 1)
+        # Pour l'affichage des noeuds, inutile d'avoir des axes
         mtpl.pyplot.axis("off")
-    pos = nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph))
 
+    # On génère les emplacements afin de pouvoir calculer la heatmap
+    pos = nx.spring_layout(graph, weight='vector', pos=nx.circular_layout(graph))
     xa = np.array([x[0] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
     ya = np.array([x[1] for i, x in enumerate(list(pos.values())) if graph.node[i]['state']])
     # La heatmap a peu d'intéret et est peu stable pour peu de valeurs
@@ -154,26 +156,32 @@ def plot(n=60, d=[4, 2], p=0.05, turns=100, graph=0.3, verbose=False):
     mtpl.pyplot.title("Etat final du réseau")
     mtpl.pyplot.plot(-1, -1, marker='o', color=(240/255, 249/255, 33/255))
     mtpl.pyplot.plot(-1, -1.2, marker='o', color=(204/255, 71/255, 120/255))
-    mtpl.pyplot.plot(-1, -1.4, marker='o', color=(13/255, 8/255, 135/255))
     mtpl.pyplot.text(-.95, -1.03, "Susceptible", fontsize=9)
     mtpl.pyplot.text(-.95, -1.23, "Infecté", fontsize=9)
-    mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
+    if mod != "SIS":
+        mtpl.pyplot.plot(-1, -1.4, marker='o', color=(13/255, 8/255, 135/255))
+        mtpl.pyplot.text(-.95, -1.43, "Retiré", fontsize=9)
 
     with sb.axes_style('darkgrid'):
         mtpl.pyplot.subplot(2, 2, 2)
     mtpl.pyplot.title("Infectés et retirés en fonction du tour")
     mtpl.pyplot.xlabel("Tour")
     mtpl.pyplot.bar(list(range(turns + 1)), infected, color=(204/255, 71/255, 120/255))
-    mtpl.pyplot.bar(list(range(turns + 1)), removed, color=(13/255, 8/255, 135/255))
+    if mod != "SIS":
+        mtpl.pyplot.bar(list(range(turns + 1)), removed, color=(13/255, 8/255, 135/255, 0.8))
 
     with sb.axes_style('darkgrid'):
         mtpl.pyplot.subplot(2, 1, 2)
-    # Nombre dérivé en fonction du nombre
+    # Portrait de phase: nombre dérivé en fonction du nombre
     mtpl.pyplot.title("Portrait de phase de l'épidémie")
-    mtpl.pyplot.xlabel("Nombre d'infectés")
-    mtpl.pyplot.ylabel("Variation du nombre d'infectés")
+    mtpl.pyplot.xlabel("Nombre d'individus")
+    mtpl.pyplot.ylabel("Variation du nombre d'individus")
+
     derivI = [0] + [infected[i] - infected[i-1] for i in range(1, len(infected))]
-    mtpl.pyplot.plot(infected, derivI, marker="o", color=(204/255, 71/255, 120/255))
+    mtpl.pyplot.plot(infected, derivI, marker="o", color=(204/255, 71/255, 120/255, 0.6))
+    if mod != "SIS":
+        derivR = [0] + [removed[i] - removed[i-1] for i in range(1, len(removed))]
+        mtpl.pyplot.plot(removed, derivR, marker="o", color=(13/255, 8/255, 135/255, 0.6))
 
     mtpl.pyplot.show()
 
