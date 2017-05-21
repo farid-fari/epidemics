@@ -40,7 +40,9 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 
 -> analyse plus pratique d'epidemies, et d'oscillations
 
-[4] - 
+[4] -  David Easley, Jon Kleinberg, **Networks, Crowds, and Markets** (2010), Chapter 21: *Epidemics*
+
+-> livre qui reprend le sujet en detail
 
 NCM - 44, 52, 69, 173, 183, 195, 196, 213, 238, 267, 278
 
