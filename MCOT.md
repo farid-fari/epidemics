@@ -11,12 +11,14 @@
 
 ## 2. Bibliographie commentée
 
-1. **Introduction** (*modèle SIR*) [1] [3] [6]
-L'étude d'épidémies est faite selon deux principales approches: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes. La plupart des modèles utilisés se traduisent facilement entre les deux approches, et le plus fameux est le modèle SIR [1]. Il s'agit de diviser la population en personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple).
+1. **Modèle SIR** [1] [3] [6]
+L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes. La plupart des modèles utilisés se traduisent facilement entre les deux approches, et le plus fameux est le modèle SIR [1]. Il s'agit de diviser la population en personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple).
+*...*
 2. **Trajectométrie** [2] + B
 3. **Stopper une épidémie** [4] [7]
-$R_0$, etc...
-4. **Extensions du modèle SIR** [5] + ...
+*$R_0$, etc...*
+4. **Extensions du modèle SIR** (*chaines de Markov*) [4] [5] [7] + ...
+*réseaux W-S, oscillations SIRS, ...*
 
 ## 3. Problématique(s) retenues
 
@@ -28,7 +30,7 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 
 - Comment **étouffer** une *épidémie donnée*, une fois lancée, en fonction du graphe et des trajectoires donnés? (identification de individus/secteurs à vacciner, à quarantiner, ...)
 - Comment **prévenir**, pour un *graphe et des trajectoires donnés*, la propagation d'un épidémie avant son incubation en fonction de ses caractéristiques? (identification de noeuds centraux, limites dans les moyens pouvant être déployés)
-- 
+- Quelles sont les **caractéristiques intéressantes** d'une épidémie dans un graphe donné?
 
 ## 5. Liste de réferences bibliographiques
 *(ébauche temporaire...)*
