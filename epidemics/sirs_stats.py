@@ -134,7 +134,10 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, sample=600, graph=0.3, verbose=F
     plt.xlabel("Nombre d'infectés")
     plt.ylabel("Variation du nombre d'infectés")
     derivI = [0] + [infected[i] - infected[i-1] for i in range(1, len(infected))]
-    plt.plot(infected, derivI, marker="o", color=(204/255, 71/255, 120/255))
+    plt.plot(infected, derivI, marker="o", color=(204/255, 71/255, 120/255, 0.6))
+    if mod != "SIS":
+        derivR = [0] + [removed[i] - removed[i-1] for i in range(1, len(removed))]
+        plt.plot(removed, derivR, marker="o", color=(13/255, 8/255, 135/255, 0.6))
 
     plt.show()
 
