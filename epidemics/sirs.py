@@ -214,20 +214,14 @@ class Sirs:
         # La base de données permet le calcul rapide et efficace de moyennes sur
         # un grand nombre de tours et de graphes
 
-        def make_sample(simid):
-            ''' Fait une expérience d'incrémentation et insère le résultat dans la BDD.
-                simid (int): le numéro unique de simulation '''
+        # On applique les itérations pour chaque simulation
+        for m in range(sample):
             # Attention aux structures mutables
             g = copy.deepcopy(self)
             for i in range(g.turn, g.turn + turns):
                 g.increment()
                 c.execute('INSERT INTO Statistics VALUES(?, ?, ?, ?)',
-                          (simid, i, g.infected[-1], g.removed[-1]))
-
-        # On utilisera des process differents pour des simulations lourdes
-        # if turns <= 200 and sample <= 600:
-        for m in range(sample):
-            make_sample(m)
+                          (m, i, g.infected[-1], g.removed[-1]))
 
         connection.commit()
         # On veut tracer des moyennes par tour
@@ -248,5 +242,5 @@ class Sirs:
 
 if __name__ == "__main__":
     s = Sirs()
-    s.increment_avg(100)
+    s.increment_avg(100, 1000)
     s.plot()
