@@ -50,11 +50,11 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 ## 5. Liste de réferences bibliographiques
 *(ébauche temporaire...)*
 
-[1] -  W. O. Kermack and A. G. McKendrick, **A Contribution to the Mathematical Theory of Epidemics**, Proceedings of the Royal Society A (1927) (...)
+[1] -  Kermack, William O., and Anderson G. McKendrick. **"A contribution to the mathematical theory of epidemics."** *Proceedings of the Royal Society of London A: mathematical, physical and engineering sciences*. Vol. 115. No. 772. The Royal Society, 1927.
 
     invention du modele SIR
 
-[2] -  David Easley, Jon Kleinberg, **Networks, Crowds, and Markets** (2010), Chapter 21: *Epidemics* (...)
+[2] -  Easley, David, and Jon Kleinberg. **Networks, crowds, and markets: Reasoning about a highly connected world**. Cambridge University Press, 2010: 567-604
 
     livre qui reprend le sujet en detail
 
@@ -66,11 +66,11 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 
     importance des mouvements
 
-[5] - H. Falconet, A.Jego, **Modéliser la propagation d'un épidémie** (2015) (...)
+[5] - Falconet, Hugo, and Antoine Jego. **"Modéliser la propagation d’une épidémie."** (2015).
 
     résume bien l'ensemble des modèles en francais, approche maths fondamentale
 
-[6] - Nicholas C. Grassly, Christophe Fraser & Geoffrey P. Garnett, **Host immunity and synchronized epidemics of syphilis across the United States**, Nature (2005) (...)
+[6] - Grassly, Nicholas C., Christophe Fraser, and Geoffrey P. Garnett. **"Host immunity and synchronized epidemics of syphilis across the United States."** *Nature* 433.7024 (2005): 417-421.
 
     analyse plus concrète des oscillations
 
@@ -81,6 +81,3 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 [8] - Watts, Duncan J., and Steven H. Strogatz. **"Collective dynamics of ‘small-world’networks."** *Nature* 393.6684 (1998): 440-442.
 
     modèle de petit monde
-
-NCM - 44, 52, 69, 173, 183, 195, 196, 213, 238, 267, 278
-
