@@ -239,7 +239,6 @@ class Sirs:
         self.graph = g.graph
         self.turn = g.turn
 
-
 if __name__ == "__main__":
     s = Sirs()
     s.increment_avg(100, 1000)

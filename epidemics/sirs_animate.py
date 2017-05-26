@@ -139,5 +139,5 @@ if __name__ == "__main__":
     try:
         subprocess.run(['ffmpeg', '-r', '8', '-i', '%d.png', 'final.mkv'])
         subprocess.run(['vlc', 'final.mkv'])
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         raise ProcessLookupError('ffmpeg ou vlc manquant')
