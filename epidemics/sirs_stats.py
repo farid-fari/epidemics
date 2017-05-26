@@ -30,32 +30,31 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, sample=600, graph=0.3, verbose=F
     # La base de données permet le calcul rapide et efficace de moyennes sur
     # un grand nombre de tours et de graphes
 
-    # On initialise le graphe aléatoire si nécessaire
-    if isinstance(graph, float) and isinstance(graph, int):
-        graph = nx.gnp_random_graph(n, graph, directed=True)
-
-    n = graph.number_of_nodes() # Dans le cas ou on ne l'a pas donné
-
-    # On initialise les attributs
-    for node in graph.nodes(data=True):
-        node[1]['state'] = 0
-        node[1]['age'] = 0
-    for edge in graph.edges(data=True):
-        edge[2]['color'] = 0
-        if edge[0] == edge[1]:
-            graph.remove_edge(edge)
-            # On retire les loopbacks
-
-    # On infecte toujours le meme individu en premier
-    graph.node[rand.randint(0, n - 1)]['state'] = 1
+    # On initialise le nombre de personnes
+    if not isinstance(graph, float) and not isinstance(graph, int):
+        n = graph.number_of_nodes()
 
     # Voir sirs.py pour des commentaires détaillés
     for k in range(sample):
         if verbose:
             print(k)
-        # Réinitialisation du graphe
-        g = graph
 
+        if isinstance(graph, float) or isinstance(graph, int):
+            # On a alors passé une densité pour la génération d'un graphe
+            g = nx.gnp_random_graph(n, graph, directed=True)
+        else:
+            g = graph
+
+        # On initialise les attributs
+        for node in g.nodes(data=True):
+            node[1]['state'] = 0
+            node[1]['age'] = 0
+        for edge in g.edges(data=True):
+            edge[2]['color'] = 0
+            if edge[0] == edge[1]:
+                g.remove_edge(edge)
+
+        g.node[rand.randint(0, n - 1)]['state'] = 1
         # Plutot que de compter dans des tableaux, on ajoutera directement les chiffres à la BDD
         for m in range(turns):
             counter = 0
@@ -111,7 +110,6 @@ def plot_avg(n=60, d=[4, 2], p=0.05, turns=100, sample=600, graph=0.3, verbose=F
         infected.append(k[1])
         removed.append(k[2])
 
-    c.close()
     connection.close()
 
     plt.figure(num=1, figsize=(15, 6))
