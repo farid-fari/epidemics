@@ -3,7 +3,9 @@
 Introduit la fonction plot pour tracer un réseau SIRS, mais aussi SIR ou SIS avec
 des paramètres bien choisis. '''
 
+import copy
 import random as rand
+import sqlite3 as sq
 import networkx as nx
 import matplotlib as mtpl
 import matplotlib.pyplot as plt
@@ -114,7 +116,7 @@ class Sirs:
             plt.subplot(2, 2, 2)
         plt.title("Infectés et retirés en fonction du tour")
         plt.xlabel("Tour")
-        print(len(self.infected))
+
         plt.bar(list(range(1, self.turn + 1)),
                 self.infected, color=(204/255, 71/255, 120/255))
         if self.mod != "SIS":
@@ -198,10 +200,53 @@ class Sirs:
             self.removed.append(remcounter)
             self.turn += 1
 
-    """def plot_avg():
-        ''' Trace l'évolution moyenne sur n tours à partir du tour actuel '''"""
+    def increment_avg(self, turns=50, sample=600):
+        ''' Calcule l'évolution moyenne sur n tours à partir du tour actuel
+            sample (int): nombre d'essais à réaliser
+
+        '''
+
+        # On crée le tableau en mémoire puisqu'il est temporaire
+        connection = sq.connect(':memory:')
+        c = connection.cursor()
+        c.execute('CREATE TABLE Statistics '
+                  '(SimId integer, Turn integer, Infected integer, Removed integer)')
+        # La base de données permet le calcul rapide et efficace de moyennes sur
+        # un grand nombre de tours et de graphes
+
+        def make_sample(simid):
+            ''' Fait une expérience d'incrémentation et insère le résultat dans la BDD.
+                simid (int): le numéro unique de simulation '''
+            # Attention aux structures mutables
+            g = copy.deepcopy(self)
+            for i in range(g.turn, g.turn + turns):
+                g.increment()
+                c.execute('INSERT INTO Statistics VALUES(?, ?, ?, ?)',
+                          (simid, i, g.infected[-1], g.removed[-1]))
+
+        # On utilisera des process differents pour des simulations lourdes
+        # if turns <= 200 and sample <= 600:
+        for m in range(sample):
+            make_sample(m)
+
+        connection.commit()
+        # On veut tracer des moyennes par tour
+        for k in c.execute('SELECT Turn, AVG(Infected), AVG(Removed) FROM Statistics'
+                           ' GROUP BY Turn ORDER BY Turn ASC'):
+            self.infected.append(k[1])
+            self.removed.append(k[2])
+
+        c.close()
+        connection.close()
+
+        # Les noeuds sont finalement incrémentés aléatoirement
+        g = copy.deepcopy(self)
+        g.increment(turns)
+        self.graph = g.graph
+        self.turn = g.turn
+
 
 if __name__ == "__main__":
     s = Sirs()
-    s.increment(100)
+    s.increment_avg(100)
     s.plot()
