@@ -20,10 +20,6 @@ Exemple de résultat obtenu avec `repartition.py` pour paramètres `secteur=102`
 
 ![exemple](trajectometry/example_traj.png?raw=true)
 
-# Trajectométrie
-
-Une étude des déplacements dans l'objectif de faire une étude sur le comportement d'épidémies dans une population.
-
 # Social
 
 Une librairie permettant l'étude d'un réseau de participants consommant deux produits et interagissant en s'influencant réciproquement.
@@ -34,6 +30,6 @@ Basé sur [Competitive Diffusion in Social Networks: Quality or Seeding?](https:
 
 # Dépendances
 
-Le code est écrit pour **Python 3.6.1** (au moins **3.6** pour les literal string). Il est nécessaire d'installer les librairies `networkx`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
+Le code est écrit pour **Python 3.6.1** (au moins **3.6** pour les 'literal string'). Il est nécessaire d'installer les librairies `networkx`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
 
 La partie trajectométrie requiert la présence de `trajecto.csv`, une liste de données contenant des informations selon un format décrit dans `convert.py`.

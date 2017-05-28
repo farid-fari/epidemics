@@ -33,7 +33,7 @@ La recherche d'un seuil épidémique est aussi à la mode: existe-t-il une fonct
 
 Enfin, l'étude de chaines de Markov *[...]*
 
-*(191 mots)*
+*(301 mots)*
 
 ## 3. Problématique(s) retenues
 
