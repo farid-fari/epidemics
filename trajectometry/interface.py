@@ -2,6 +2,7 @@
 
 Définit la classe Person qui décrit une ligne de la base de données.'''
 
+import os
 import sqlite3 as sq
 import warnings
 
@@ -21,18 +22,17 @@ TIMES = [0, 15, 30, 45, 100, 115, 130, 145, 200, 215, 230, 245, 300, 315, 330, 3
          1930, 1945, 2000, 2015, 2030, 2045, 2100, 2115, 2130, 2145, 2200, 2215, 2230, 2245,
          2300, 2315, 2330, 2345]
 
+# Utilise un chemin absolu pour retrouver la BDD
+_PATH = os.path.join(os.path.dirname(__file__), 'trajecto.db')
+
 class Person:
     ''' Crée un objet Person facilement manipulable en lisant la base de données
         donnée par cursor afin de récupérer la clé demandée.'''
 
-    def __init__(self, cle=None, cursor=None):
-        '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir
+    def __init__(self, cursor, cle=None):
+        '''curs (sq.Cursor): curseur vers la base de données
            cle (int/str): la clé de la personne en question'''
-        closeconn = False
-        if cursor is None:
-            conn = sq.connect('trajecto.db')
-            cursor = conn.cursor()
-            closeconn = True
+
         if cle is None:
             # On prend une personne arbitraire
             cursor.execute("SELECT * FROM Personnes LIMIT 1")
@@ -58,10 +58,7 @@ class Person:
         for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY"
                                 " heure ASC LIMIT 100", (self.cle,)):
             self.positions.append(h[0])
-
-        if closeconn:
-            cursor.close()
-            conn.close()
+        # Je ne referme pas un curseur qui ne m'appartient pas
 
     def __str__(self):
         return f"id={self.cle}\nsecteur={self.secteur}"
@@ -69,12 +66,11 @@ class Person:
 class Secteur:
     '''Charge et gère un secteur entier composé de Persons.'''
 
-    def __init__(self, secteur, cursor=None):
-        '''cursor (sqlite.Cursor): le curseur pointant sur la base de données à quérir (sera fermée)
-           secteur (int): le numéro de secteur à indexer'''
-        if cursor is None:
-            conn = sq.connect('trajecto.db')
-            cursor = conn.cursor()
+    def __init__(self, secteur):
+        '''secteur (int): le numéro de secteur à indexer'''
+
+        conn = sq.connect(_PATH)
+        cursor = conn.cursor()
 
         cursor.execute("SELECT cle FROM Personnes WHERE secteur = ?", (secteur,))
         self.code = secteur
@@ -82,9 +78,8 @@ class Secteur:
         self.keys = [p[0] for p in cursor.fetchall()]
         self.people = {i: None for i in self.keys}
         self.nombre = len(self.people)
-
-        cursor.close()
-        conn.close()
+        self.db = (conn, cursor)
+        # Je ne referme le curseur que quand on me supprime
 
     def person(self, cle):
         '''Charge et rend une personne individuelle associée à une clé.
@@ -95,7 +90,7 @@ class Secteur:
         if self.people[cle]:
             return self.people[cle]
         # else
-        self.people[cle] = Person(cle)
+        self.people[cle] = Person(self.db[1], cle)
         return self.people[cle]
 
     # Permet de faire des 'for x in secteur:' avec un chargement flemmard
@@ -108,10 +103,15 @@ class Secteur:
         return f"code={self.code}\nnombre={self.nombre}"
 
 if __name__ == "__main__":
-    p = Person()
+    c = sq.connect(_PATH)
+    curs = c.cursor()
+    p = Person(curs)
     print(p)
 
     print("---")
 
     s = Secteur(101)
     print(s)
+
+    curs.close()
+    c.close()
