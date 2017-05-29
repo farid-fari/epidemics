@@ -11,29 +11,33 @@
 
 ## 2. Bibliographie commentée
 
-1. **Modèle SIR** [1] [2]
+##### 1. **Modèle SIR**
 
-L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes. La plupart des modèles utilisés se traduisent facilement entre les deux approches, et le plus fameux est le modèle SIR [1]. Il s'agit de diviser la population en personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple). *[...]*
+L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes. La plupart des modèles utilisés se traduisent facilement entre les deux approches, et le plus fameux est le modèle SIR [1]. Il s'agit de diviser la population en personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple). [2]
 
-2. **Trajectométrie** + Bic
+ *[...]*
+
+##### 2. **Trajectométrie** (+ Bic)
 
 Dans les épidémies se propageant de manière rapide et peu prédictible, l'étude des déplacements devient primordiale. Aussi est-il capital de savoir interpréter le role de ces derniers dans la transmission d'une épidémie [3]. Au-delà du role de diffusion joué par ces mouvements, leurs impacts sont souvent hétérogènes sur les populations - certaines classes sociales sont nettements plus touchés que d'autres, expliquant par exemple la diffusion du Malaria en Afrique [4].
 
-3. **Stopper une épidémie**
+L'étude des déplacements au sein d'une région est nommée trajectométrie, et se fait souvent à partir d'enquêtes 
 
-*$R_0$, etc...*
+##### 3. **Stopper une épidémie**
 
-4. **Extensions du modèle SIR**
+La recherche d'un seuil épidémique est un domaine très exploré: existe-t-il une fonction permettant de dire si une épidémie va persister ou non à partir des paramètres et d'un seuil? [7] Déterminer une telle fonction permetterait d'identifier les moyens les plus efficaces de stopper une épidémie. Dans certains modèles, un seuil épidémique est établi et prouvé, dans d'autres il est démontré qu'il n'existe pas de tel seuil. [2] [9] La question reste cependant à controverse, la recherche de seuil étant encore très peu précise et certaine. [9] 
+
+D'autres pistes dans la recherche de manières de stopper un épidémie consiste à ajouter certains facteurs non pris en compte dans le modèle SIR traditionel, tels que les vaccinations ou les mises en quarantaine. [10] 
+
+##### 4. **Extensions du modèle SIR**
 
 Une des études les plus populaires dans l'épidémiologie est celle des synchronisations dans un réseau: lorsque les conditions sont rassemblées, une épidémie peut survivre par "vagues", en apparaissant et disparaissant dans différentes régions [2]. C'est par exemple le cas de certaines MST, comme la syphilis aux Etats-Unis [5].
 
 Les phénomènes dits de "petit monde" sont aussi importants dans l'étude d'une épidémie: les hommes se relieraient en vaste cliques, qui sont particulièrement vulnérables envers certaines épidémies [7]. Le modèle notable est celui de *Watts-Strogatz* [8], qui est souvent cité comme archétype du "petit monde".
 
-La recherche d'un seuil épidémique est aussi à la mode: existe-t-il une fonction permettant de dire si une épidémie va persister ou non à partir des paramètres et d'un seuil? [7] Dans certains modèles, un seuil épidémique est établi et prouvé, dans d'autres il est démontré qu'il n'existe pas de tel seuil.
-
 Enfin, l'étude de chaines de Markov *[...]*
 
-*(301 mots)*
+*(367 mots)*
 
 ## 3. Problématique(s) retenues
 
@@ -78,6 +82,15 @@ Déterminer des méthodes de limitation de propoagation pour tout graphe et tout
 
     tour du domaine
 
-[8] - Watts, Duncan J., and Steven H. Strogatz. **"Collective dynamics of ‘small-world’networks."** *Nature* 393.6684 (1998): 440-442.
+[8] - Watts, Duncan J., and Steven H. Strogatz. **"Collective dynamics of ‘small-world’ networks."** *Nature* 393.6684 (1998): 440-442.
 
     modèle de petit monde
+    
+[9] - Wang, Wei, et al. **"Predicting the epidemic threshold of the susceptible-infected-recovered model."** *Scientific reports* 6 (2016).
+
+    méthodes de prédiction de seuil + incertitudes liées à ces prédictions
+
+[10] - Hethcote, Herbert, Ma Zhien, and Liao Shengbing. "Effects of quarantine in six endemic models for infectious diseases." Mathematical Biosciences 180.1 (2002): 141-160.
+
+    mises en quarantaine
+    
