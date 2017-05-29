@@ -50,8 +50,10 @@ class Sirs:
 
         self.infected = [1]
         self.removed = [0]
-        # On infecte un patient zero en on l'affiche
-        self.graph.node[rand.randint(0, n - 1)]['state'] = 1
+        # On infecte un patient zero
+        _, z = rand.choice(list(self.graph.node.items()))
+        z['state'] = 1
+        #self.graph.node[rand.randint(0, self.n - 1)]['state'] = 1
 
         self.d = d
         self.p = p
