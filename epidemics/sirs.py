@@ -82,9 +82,9 @@ class Sirs:
         # On génère les emplacements afin de pouvoir calculer la heatmap
         pos = nx.spring_layout(self.graph, weight='vector', pos=nx.circular_layout(self.graph))
         xa = np.array([x[0]
-                       for i, x in enumerate(list(pos.values())) if self.graph.node[i]['state']])
+                       for i, x in enumerate(list(pos.values())) if list(self.graph.node.values())[i]['state']])
         ya = np.array([x[1]
-                       for i, x in enumerate(list(pos.values())) if self.graph.node[i]['state']])
+                       for i, x in enumerate(list(pos.values())) if list(self.graph.node.values())[i]['state']])
         # La heatmap a peu d'intéret et est peu stable pour peu de valeurs
         if xa.size > 2:
             sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
