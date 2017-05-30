@@ -204,9 +204,7 @@ class Sirs:
 
     def increment_avg(self, turns=50, sample=600):
         ''' Calcule l'évolution moyenne sur n tours à partir du tour actuel
-            sample (int): nombre d'essais à réaliser
-
-        '''
+            sample (int): nombre d'essais à réaliser '''
 
         # On crée le tableau en mémoire puisqu'il est temporaire
         connection = sq.connect(':memory:')
