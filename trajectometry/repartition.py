@@ -6,7 +6,7 @@ import seaborn as sb
 import numpy as np
 import matplotlib as mtpl
 import matplotlib.pyplot as plt
-from interface import Secteur, MAP, TIMES
+from .interface import Secteur, MAP, TIMES
 
 def plot(secteur):
     # Permet d'avoir des étiquettes raisonnables dans le graphe final

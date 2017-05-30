@@ -3,7 +3,10 @@
 Introduit la fonction passage pour calculer cette matrice.'''
 
 import numpy as np
-from interface import Secteur, MAP, TIMES
+if __name__ == "__main__":
+    from interface import Secteur, MAP, TIMES
+else:
+    from .interface import Secteur, MAP, TIMES
 
 def passage(sect, tf, ti=None, memo=None, verbose=False):
     '''Rend M(tf|ti) pour un secteur donné.
