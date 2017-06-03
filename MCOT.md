@@ -17,15 +17,15 @@ L'épidémiologie est la branche des mathématiques appliquées s'intéressant �
 
 ##### 2. **Modèle SIR**
 
-L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes. La plupart des modèles utilisés se traduisent facilement entre les deux approches, et le plus fameux est le modèle SIR [1]. Il s'agit de diviser la population en personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple). [2]
+L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes et de chaines de Markov. La plupart des modèles utilisés peuvent etre étudiés avec les deux approches, et le plus connu est le modèle SIR [1]. Il s'agit de diviser la population en trois catégories: les personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple). [2]
 
- *[...]*
+*[...]*
 
 ##### 3. **Trajectométrie** (+ Bic)
 
-Dans les épidémies se propageant de manière rapide et peu prédictible, l'étude des déplacements devient primordiale. Aussi est-il capital de savoir interpréter le role de ces derniers dans la transmission d'une épidémie [3]. Au-delà du role de diffusion joué par ces mouvements, leurs impacts sont souvent hétérogènes sur les populations - certaines classes sociales sont nettements plus touchés que d'autres, expliquant par exemple la diffusion du Malaria en Afrique [4].
+Dans les épidémies se propageant de manière rapide et peu prédictible, l'étude des déplacements devient primordiale. Aussi est-il capital de savoir interpréter le role de ces derniers dans la transmission d'une épidémie [3]. Au-delà du role de propagation joué par ces mouvements, leurs impacts sont souvent hétérogènes sur les populations - certaines classes sociales sont nettements plus touchés que d'autres, expliquant par exemple la diffusion du Malaria en Afrique [4].
 
-L'étude des déplacements au sein d'une région est nommée trajectométrie, et se fait souvent à partir d'enquêtes
+L'étude des déplacements au sein d'une région est nommée trajectométrie, et se fait souvent à partir d'enquêtes de déplacement réalisées au sein d'une région, permettant de modéliser les déplacements par un graphe.
 
 Enfin, l'étude de chaines de Markov *[...]*
 
@@ -37,9 +37,11 @@ D'autres pistes dans la recherche de manières de stopper un épidémie consiste
 
 ##### 5. **Extensions du modèle SIR**
 
-Une des études les plus populaires dans l'épidémiologie est celle des synchronisations dans un réseau: lorsque les conditions sont rassemblées, une épidémie peut survivre par "vagues", en apparaissant et disparaissant dans différentes régions [2]. C'est par exemple le cas de certaines MST, comme la syphilis aux Etats-Unis [5].
+Une des études les plus faites récemment est celle des synchronisations dans un réseau: lorsque les conditions sont rassemblées, une épidémie peut survivre par "vagues", en apparaissant et disparaissant dans différentes régions [2]. C'est par exemple le cas de certaines MST, comme la syphilis aux Etats-Unis [5].
 
 Les phénomènes dits de "petit monde" sont aussi importants dans l'étude d'une épidémie: les hommes se relieraient en vaste cliques, qui sont particulièrement vulnérables envers certaines épidémies [7]. Le modèle notable est celui de *Watts-Strogatz* [8], qui est souvent cité comme archétype du "petit monde".
+
+### **+reseaux scale free** (important)
 
 *(367 mots)*
 
@@ -49,7 +51,7 @@ Comment modéliser la propagation d'une épidémie dans une région?
 
 ## 4. Objectif(s) du travail
 
-Déterminer des méthodes de limitation de propoagation pour tout graphe et toute infection étant trop compliqué, nous avons divisé le problème en deux optiques envisageables:
+L'étude générale de propagation sur tout graphe et toute infection étant trop compliqué, nous avons divisé le problème en deux optiques envisageables:
 
 - Comment **étouffer** une *épidémie donnée*, une fois lancée, en fonction du graphe et des trajectoires donnés? (identification de individus/secteurs à vacciner, à quarantiner, ...)
 - Comment **prévenir**, pour un *graphe et des trajectoires donnés*, la propagation d'un épidémie avant son incubation en fonction de ses caractéristiques? (identification de noeuds centraux, limites dans les moyens pouvant être déployés)
