@@ -11,39 +11,33 @@
 
 ## 2. Bibliographie commentée
 
-#### 1. "Amorce"
+#### 1. Introduction - modèle SIR (*161w*)
 
-L'épidémiologie est la branche des mathématiques appliquées s'intéressant à la modélisation d' une population donnée et la propagation d'un agent infectieux en son sein. Effectuer une "étude épidémique", c'est tenter de simuler le plus fidèlement possible la propagation d'une épidémie donnée au sein de la population étudiée, qu'elle soit humaine, animale ou informatique, afin d'anticiper au mieux une potentielle situation réelle. Concrètement, il s'agit d'implanter un modèle de la population étudiée (généralement un graphe), dans lequel on introduit un certain nombre de paramètres qui vont tenter de traduire au mieux les connections réelles entre les individus et les caractéristiques propres à la maladie, comme sa virulence ou sa durée d'incubation par exemple, puis d'introduire un individu infecté dans le groupe, et enfin de lancer la simulation. C'est là qu'intervient le modèle SIR.
+L'épidémiologie est la branche des mathématiques appliquées s'intéressant à la modélisation d' une population donnée et la propagation d'un agent infectieux en son sein. Effectuer une "étude épidémique", c'est tenter de simuler le plus fidèlement possible la propagation d'une épidémie donnée au sein de la population étudiée, qu'elle soit humaine, animale ou informatique, afin d'anticiper au mieux une épidémie réelle. **60w**
 
-##### 2. **Modèle SIR**
+L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes et de chaines de Markov. La plupart des modèles utilisés peuvent etre étudiés avec les deux approches, et le plus connu est le modèle SIR [1]. Il s'agit de diviser la population en trois catégories: les personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple). [2] **101w**
 
-L'étude d'épidémies est faite selon deux principaux axes: l'approche déterministe qui relève des équations différentielles, et l'approche stochastique qui se base sur l'étude de graphes et de chaines de Markov. La plupart des modèles utilisés peuvent etre étudiés avec les deux approches, et le plus connu est le modèle SIR [1]. Il s'agit de diviser la population en trois catégories: les personnes *susceptibles* de contracter l'épidémie, celles qui sont *infectées* et celles qui sont *retirées* (mortes ou immunisées). De ce modèle découlent la plupart des autre modèles étudiés, qui font entrer en jeu d'autres facteurs (immunité temporaire ou période d'incubation, par exemple). [2]
+#### 2. Trajectométrie (+ Bic) (*79w*)
 
-*[...]*
+Dans les épidémies se propageant de manière rapide et peu prédictible, l'étude des déplacements devient primordiale. [3] L'étude des déplacements au sein d'une région est nommée trajectométrie, et se fait souvent à partir d'enquêtes de déplacement réalisées au sein d'une région, permettant de modéliser les déplacements par un graphe, auquel on peut appliquer le modèle SIR. Il est démontré que le nombre d'individus atteints par une épidémie sur un modèle SIR dépend fortement de la distance parcourue par les individus. [3]
 
-##### 3. **Trajectométrie** (+ Bic)
+L'étude des mouvements peut aussi se faire par l'étude de chaines de Markov *[...]*
 
-Dans les épidémies se propageant de manière rapide et peu prédictible, l'étude des déplacements devient primordiale. Aussi est-il capital de savoir interpréter le role de ces derniers dans la transmission d'une épidémie [3]. Au-delà du role de propagation joué par ces mouvements, leurs impacts sont souvent hétérogènes sur les populations - certaines classes sociales sont nettements plus touchés que d'autres, expliquant par exemple la diffusion du Malaria en Afrique [4].
+#### 3. Stopper une épidémie (*118w*)
 
-L'étude des déplacements au sein d'une région est nommée trajectométrie, et se fait souvent à partir d'enquêtes de déplacement réalisées au sein d'une région, permettant de modéliser les déplacements par un graphe.
+La recherche d'un seuil épidémique est un domaine très exploré: existe-t-il une fonction permettant de dire si une épidémie va persister ou non à partir de ses paramètres et d'un seuil? [7] Déterminer une telle fonction permetterait d'identifier les moyens les plus efficaces de stopper une épidémie. Dans certains modèles, un seuil épidémique est établi et prouvé, dans d'autres il est démontré qu'il n'existe pas de tel seuil. [2] [9] La question reste cependant à controverse, la recherche de seuil étant encore très peu précise et certaine. [9]
 
-Enfin, l'étude de chaines de Markov *[...]*
+D'autres pistes dans la recherche de manières de stopper un épidémie consiste à ajouter certains facteurs non pris en compte dans le modèle SIR traditionel, tels que les vaccinations ou les mises en quarantaine. [2] [10] *[...]*
 
-##### 4. **Stopper une épidémie**
-
-La recherche d'un seuil épidémique est un domaine très exploré: existe-t-il une fonction permettant de dire si une épidémie va persister ou non à partir des paramètres et d'un seuil? [7] Déterminer une telle fonction permetterait d'identifier les moyens les plus efficaces de stopper une épidémie. Dans certains modèles, un seuil épidémique est établi et prouvé, dans d'autres il est démontré qu'il n'existe pas de tel seuil. [2] [9] La question reste cependant à controverse, la recherche de seuil étant encore très peu précise et certaine. [9]
-
-D'autres pistes dans la recherche de manières de stopper un épidémie consiste à ajouter certains facteurs non pris en compte dans le modèle SIR traditionel, tels que les vaccinations ou les mises en quarantaine. [10]
-
-##### 5. **Extensions du modèle SIR**
+#### 4. Extensions du modèle SIR (*85w*)
 
 Une des études les plus faites récemment est celle des synchronisations dans un réseau: lorsque les conditions sont rassemblées, une épidémie peut survivre par "vagues", en apparaissant et disparaissant dans différentes régions [2]. C'est par exemple le cas de certaines MST, comme la syphilis aux Etats-Unis [5].
 
-Les phénomènes dits de "petit monde" sont aussi importants dans l'étude d'une épidémie: les hommes se relieraient en vaste cliques, qui sont particulièrement vulnérables envers certaines épidémies [7]. Le modèle notable est celui de *Watts-Strogatz* [8], qui est souvent cité comme archétype du "petit monde".
+Les phénomènes dits de "petit monde" sont aussi importants dans l'étude d'une épidémie: les hommes se relieraient en vaste cliques, qui sont particulièrement vulnérables envers certaines épidémies. [7] Le modèle notable est celui de *Watts-Strogatz* [8], qui est l'archétype du "petit monde".
 
-### **+reseaux scale free** (important)
+##### +reseaux scale free (important)
 
-*(367 mots)*
+*(443 mots)*
 
 ## 3. Problématique(s) retenues
 
@@ -71,10 +65,6 @@ L'étude générale de propagation sur tout graphe et toute infection étant tro
 [3] - Downton, F. (1972). **The Area under the Infectives Trajectory of the General Stochastic Epidemic**. *Journal of Applied Probability*, 9(2), 414-417. doi:10.2307/3212809
 
     importance de la trajectoire
-
-[4] - Martens, Pim, and Lisbeth Hall. **"Malaria on the move: human population movement and malaria transmission."** *Emerging infectious diseases 6.2* (2000): 103.
-
-    importance des mouvements
 
 [5] - Falconet, Hugo, and Antoine Jego. **"Modéliser la propagation d’une épidémie."** (2015).
 
