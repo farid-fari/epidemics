@@ -5,13 +5,11 @@ from scipy.special import binom
 import matplotlib.pyplot as plt
 from sirs import Sirs
 
-s = Sirs(n=200, p=0.05, graph=0.1)
-x = list(range(1, 200))
-y = []
-for _ in x:
-    # Valeur théorique de l'entropie du système
-    y.append(log(binom(s.n, s.infected[-1])))
-    s.increment()
-
-plt.plot(x, y, 'y')
+s = Sirs()
+s.increment_avg(100, 600)
+# Valeur théorique de l'entropie du système
+y = [log(binom(s.n, i)) for i in s.infected]
+s.plot()
+plt.plot(list(range(len(y))), y, 'y')
+plt.title(f'Entropie en fonction du tour (n={s.n}, p={s.p}, t={s.turn})')
 plt.show()
