@@ -73,7 +73,8 @@ class Sirs:
 
         plt.figure(num=1, figsize=(15, 12))
         self.updatemod()
-        plt.suptitle(f"Etat final du modèle {self.mod} après {self.turn} tours")
+        # Numéro de tour -1 = nombre de tours simulés
+        plt.suptitle(f"Etat final du modèle {self.mod} après {self.turn-1} tours")
         with sb.axes_style('dark'):
             plt.subplot(2, 2, 1)
             # Pour l'affichage des noeuds, inutile d'avoir des axes
@@ -82,9 +83,11 @@ class Sirs:
         # On génère les emplacements afin de pouvoir calculer la heatmap
         pos = nx.spring_layout(self.graph, weight='vector', pos=nx.circular_layout(self.graph))
         xa = np.array([x[0]
-                       for i, x in enumerate(list(pos.values())) if self.graph.node[i]['state']])
+                       for i, x in enumerate(list(pos.values()))
+                       if list(self.graph.node.values())[i]['state']])
         ya = np.array([x[1]
-                       for i, x in enumerate(list(pos.values())) if self.graph.node[i]['state']])
+                       for i, x in enumerate(list(pos.values()))
+                       if list(self.graph.node.values())[i]['state']])
         # La heatmap a peu d'intéret et est peu stable pour peu de valeurs
         if xa.size > 2:
             sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
