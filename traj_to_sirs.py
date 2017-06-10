@@ -2,6 +2,7 @@
 
 Introduit la fonction to_sirs, pouvant prendre un certain temps à s'éxecuter. '''
 
+import sys
 import time
 import networkx as nx
 import numpy as np
@@ -20,11 +21,20 @@ def depl_matrix(secteurs, heure):
     acc = np.zeros((98, 98))
     for i, j in enumerate(secteurs):
         t = time.time()
-        print(j.code, ' - ', heure, end='')
+        print(f'{j.code} - {heure}', end='')
+        sys.stdout.flush()
         m, _ = passage(MAP[i], heure, memo=j)
         acc += m
-        print(' - ', round(time.time()-t, 1), 's')
-    acc /= 97
+        print(f' -  {round(time.time()-t, 1)}s')
+
+    acc /= len(secteurs)
+
+    # Déboggage éventuel
+    # for i in range(98):
+    #     for j in range(98):
+    #         if acc[i][j]:
+    #             print((i, j), acc[i][j])
+
     return acc
 
 def to_sirs(m):
@@ -45,9 +55,28 @@ def to_sirs(m):
                 g.add_edge(MAP[i], MAP[j])
     return Sirs(graph=g)
 
-sect = [Secteur(i) for i in MAP[:1]]
-for k in TIMES:
+sect = [Secteur(i) for i in MAP]
+for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
     c = depl_matrix(sect, k)
     s = to_sirs(c)
-    s.increment(100)
+    s.p = 0.9
+    s.increment_avg(100, 300)
     s.plot()
+
+# Heures produisant un résulat non nul (p=0.9):
+# 400 = oscillations amorties
+# 700 = oscillations infinies!!
+# 800 - oscillations intenses et amorties
+# 900 - idem
+# 1000 - idem mais non amorti
+# 1100 - oscilations peu itenses!!!
+# 1200 - oscillations trees tres tres intenses!!
+# 1300 - moyennement intense, amorti
+# 1400 - comme 1200
+# 1500 - comme 1300
+# 1600 - comme 1200
+# 1700 - comme 800
+# 1800 - comme 1200
+# 1900 - oscillations tres régulières
+# 2000 - idem
+# 2100 - oscillations s'amortiaant très régulièrement

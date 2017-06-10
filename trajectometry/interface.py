@@ -66,17 +66,22 @@ class Person:
 class Secteur:
     '''Charge et gère un secteur entier composé de Persons.'''
 
-    def __init__(self, secteur):
-        '''secteur (int): le numéro de secteur à indexer'''
+    def __init__(self, secteur, lazy=True):
+        '''secteur (int): le numéro de secteur à indexer
+           lazy (bool): s'il faut charger les personnes plus tard'''
 
         conn = sq.connect(_PATH)
         cursor = conn.cursor()
 
         cursor.execute("SELECT cle FROM Personnes WHERE secteur = ?", (secteur,))
         self.code = secteur
-        # Algorithme flemmard: on ne charge que les clés
         self.keys = [p[0] for p in cursor.fetchall()]
-        self.people = {i: None for i in self.keys}
+        if lazy:
+            # Algorithme flemmard: on ne charge que les clés
+            self.people = {i: None for i in self.keys}
+        else:
+            # On charge tout le monde d'un coup (couteux)
+            self.people = {i: self.person(i) for i in self.keys}
         self.nombre = len(self.people)
         self.db = (conn, cursor)
         # Je ne referme le curseur que quand on me supprime
