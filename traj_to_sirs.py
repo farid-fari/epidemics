@@ -29,12 +29,6 @@ def depl_matrix(secteurs, heure):
 
     acc /= len(secteurs)
 
-    # Déboggage éventuel
-    # for i in range(98):
-    #     for j in range(98):
-    #         if acc[i][j]:
-    #             print((i, j), acc[i][j])
-
     return acc
 
 def to_sirs(m):
@@ -52,7 +46,9 @@ def to_sirs(m):
             # i correspond au secteur d'arrivée (ligne)
             # j correspond au secteur de départ (colonne)
             if i != j and b != 0:
-                g.add_edge(MAP[i], MAP[j])
+                # On augmente arbitrairement la proba
+                # A revoir plus tard
+                g.add_edge(MAP[i], MAP[j], p=b*97)
     return Sirs(graph=g)
 
 sect = [Secteur(i) for i in MAP]

@@ -42,8 +42,12 @@ class Sirs:
             node[1]['age'] = 0
             node[1]['infections'] = 0
         for edge in self.graph.edges(data=True):
-            # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
-            edge[2]['color'] = 0
+            if not 'p' in edge[2]:
+                # Aucune proba d'infection spécifiée ici
+                edge[2]['p'] = p
+
+            # color = 0 -> .5 neutre, 1 tentative d'infection, 2 infection transmise
+            edge[2]['color'] = edge[2]['p'] / 2
             # sert dans l'affichage en ressorts
             # vector = 0.01 simple connection, 0.05 si essai de transmission, 1 sinon
             edge[2]['vector'] = 0.01
@@ -53,20 +57,20 @@ class Sirs:
         # On infecte un patient zero
         _, z = rand.choice(list(self.graph.node.items()))
         z['state'] = 1
-        #self.graph.node[rand.randint(0, self.n - 1)]['state'] = 1
 
         self.d = d
-        self.p = p
-        self.mod = "SIS"
+        # On ne garde qu'une proba moyenne
+        self.p = np.mean([e[2]['p'] for e in self.graph.edges(data=True)])
         self.updatemod()
 
     def updatemod(self):
-        ''' Met à jour le nom de modèle. '''
+        ''' Met à jour le modèle. '''
         self.mod = "SIS"
         if self.d[1]:
             self.mod = "SIRS"
         if self.d[1] >= self.turn:
             self.mod = "SIR"
+        self.p = np.mean([e[2]['p'] for e in self.graph.edges(data=True)])
 
     def plot(self):
         '''Trace l'état actuel avec évolution, portrait de phase, ...'''
@@ -162,7 +166,7 @@ class Sirs:
                         for other in self.graph[node[0]]:
                             # Si l'autre est dans l'état S
                             if not self.graph.node[other]['state']:
-                                if rand.random() < self.p:
+                                if rand.random() < self.graph.edge[node[0]][other]['p']:
                                     # On met les stats au mode infecté
                                     self.graph.node[other]['state'] = 1
                                     self.graph.node[other]['age'] = 0 # par sureté (non nécessaire)
@@ -244,5 +248,5 @@ class Sirs:
 
 if __name__ == "__main__":
     s = Sirs()
-    s.increment_avg(100, 1000)
+    s.increment_avg(100, 500)
     s.plot()
