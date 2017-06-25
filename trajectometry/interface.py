@@ -23,7 +23,7 @@ TIMES = [0, 15, 30, 45, 100, 115, 130, 145, 200, 215, 230, 245, 300, 315, 330, 3
          2300, 2315, 2330, 2345]
 
 # Utilise un chemin absolu pour retrouver la BDD
-_PATH = os.path.join(os.path.dirname(__file__), 'trajecto.db')
+_PATH = os.path.join(os.path.dirname(__file__), 'trajecto_other.db')
 
 class Person:
     ''' Crée un objet Person facilement manipulable en lisant la base de données
@@ -53,11 +53,8 @@ class Person:
         self.redressement = float(data[3])
         self.occupation = int(data[4])
 
-        self.positions = []
         # On récupére les 96 horaires et positions associées dans l'ordre
-        for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY"
-                                " heure ASC LIMIT 100", (self.cle,)):
-            self.positions.append(h[0])
+        self.positions = data[5:]
         # Je ne referme pas un curseur qui ne m'appartient pas
 
     def __str__(self):
