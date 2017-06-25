@@ -36,7 +36,7 @@ class NeoSirs:
     ''' Convertit une matrice de déplacements en un modèle SIRS figé
     !!! Requiert un serveur neo4j correctement configuré '''
 
-    def __init__(self, m, uri="bolt://localhost:7687"):
+    def __init__(self, m, d=[4, 2], uri="bolt://localhost:7687"):
         ''' m (np.array): la matrice des déplacements '''
 
         self.driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
@@ -64,15 +64,24 @@ class NeoSirs:
             ses.run("MATCH (p:Personne {id: {z}}) SET p.state = 1", {"z": z})
 
             #TESTETSTETSTET
-            ses.run("Match (p:Personne), (q:Personne) WHERE id(p) < id(q) CREATE (p)-[r:Lien {p: 0.01}]->(q)")
+            ses.run("Match (p:Personne), (q:Personne)"
+                    "WHERE id(p) < id(q) CREATE (p)-[r:Lien {p: 0.01}]->(q)")
+        self.d = d
 
     def step(self, turns=1):
         ''' Avancer de turns tours '''
 
         with self.driver.session() as ses:
-            for n in ses.run("MATCH (p:Personne {state: 1})-[r:Lien]->(q) RETURN q, r.p").records():
-                if n['q']['state'] == 0 and random.random() < n['r.p']:
-                    ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 1", {"i": n['q']['id']})
+            for n in ses.run("MATCH (p:Personne)-[r:Lien]->(q) "
+                             "WHERE p.state > 0 "
+                             "RETURN p, q, r.p").records():
+                if n['p']['age'] < self.d[0]:
+                    if n['q']['state'] == 0 and random.random() < n['r.p']:
+                        ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 1",
+                                {"i": n['q']['id']})
+                        ses.run("MATCH (p:Personne {id: {i}}), (q:Personne {id: {j}}) "
+                                "CREATE (p)-[:Infection]->(q)",
+                                {"i": n['p']['id'], "j": n["q"]["id"]})
 
         if turns > 1:
             self.step(turns-1)

@@ -157,8 +157,8 @@ class Sirs:
         remcounter = 0
         # Evite de traiter des patient infectés dès ce tour-ci
         for node in [k for k in self.graph.nodes(data=True) if k[1]['state'] >= 1]:
-            # On ne s'interesse qu'aux patients infectés
             if node[1]['state'] == 1:
+                # On s'interesse d'abord aux patients infectés
                 counter += 1
                 if node[1]['age'] < self.d[0]:
                     node[1]['age'] += 1
