@@ -10,24 +10,25 @@ from epidemics.sirs import Sirs
 from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
 
-def depl_matrix(secteurs, heure):
+def depl_matrix(secteurs, heure, verbose=False):
     ''' Convertit les données de trajectométrie en modèle SIRS.
 
     secteurs (Secteur list): la liste des secteurs préchargés
     heure (int): l'heure à laquelle on veut faire le modèle
+    verbose (bool): s'il faut faire du bruit
 
     retourne: acc (np.array) les déplacements durant l'heure donnée '''
 
     acc = np.zeros((98, 98))
     for i, j in enumerate(secteurs):
-        t = time.time()
-        print(f'{j.code} - {heure}', end='')
-        sys.stdout.flush()
+        if verbose:
+            t = time.time()
+            print(f'{j.code} - {heure}', end='')
+            sys.stdout.flush()
         m, _ = passage(MAP[i], heure, memo=j)
         acc += m
-        print(f' -  {round(time.time()-t, 1)}s')
-
-    acc /= len(secteurs)
+        if verbose:
+            print(f' -  {round(time.time()-t, 1)}s')
 
     return acc
 
@@ -48,8 +49,7 @@ def to_sirs(m):
             if i != j and b != 0:
                 # On augmente arbitrairement la proba
                 # A revoir plus tard
-                g.add_edge(MAP[i], MAP[j], p=97*b)
-                print(97*b)
+                g.add_edge(MAP[i], MAP[j], p=b)
 
     return Sirs(graph=g)
 

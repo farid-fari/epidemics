@@ -71,12 +71,12 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
             # On divise la colonne par le nombre de personnes y ayant contribué
             m[:, i] /= posinit[i]
 
-    # On procède par récurrence
+    # On procède par récursion
     if nt - ot == 0:
         return np.identity(98), (posinit, posinit)
     if nt - ot == 1:
         return m, (posinit, posfin)
-    # else
+    # else, récursion
     x, (_, y) = passage(sect, TIMES[nt], TIMES[nextt], secteur, verbose=verbose)
     return np.dot(x, m), (posinit, y)
 
