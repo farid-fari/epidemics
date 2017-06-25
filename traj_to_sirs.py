@@ -9,6 +9,8 @@ import LemonGraph as lg
 from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
 
+d = [4, 2]
+
 def depl_matrix(secteurs, heure):
     ''' Convertit les données de trajectométrie en modèle SIRS.
 
@@ -44,6 +46,7 @@ class Sirs:
             for i in range(0, 98):
                 self.nodes.append(txn.node(type='sect', value=MAP[i]))
                 self.nodes[-1]['state'] = 0
+                self.nodes[-1]['age'] = 0
             for i, a in enumerate(m):
                 for j, b in enumerate(a):
                     # i correspond au secteur d'arrivée (ligne)
@@ -52,14 +55,27 @@ class Sirs:
                         # On augmente arbitrairement la proba
                         # A revoir plus tard
                         txn.edge(src=self.nodes[i], tgt=self.nodes[j], value=97*b)
-        # Patient zero
-        z = random.choice(self.nodes)
-        z['state'] = 1
+            # Patient zero
+            z = random.randint(0, 97)
+            self.nodes[z]['state'] = 1
 
     def step(self, i=1):
         with self.g.transaction(write=False) as txn:
-            for e in txn.query('n(state=1)->e()->n()'):
-                print e
+            for e in txn.query('n(state="1")'):
+                if e[0]['age'] < d[0]:
+                    for o in txn.query('@n(ID=' + str(e[0]['ID']) + ')->n()'):
+                        print o
+                    e[0]['age'] += 1
+                else:
+                    e[0]['state'] = 2
+                    e[0]['age'] = 0
+            for e in txn.query('n(state="2")'):
+                if e[0]['age'] >= d[1]:
+                    e[0]['state'] = 2
+                    e[0]['age'] = 0
+                else:
+                    e[0]['age'] += 1
+
         if i > 1:
             step(i-1)
 
