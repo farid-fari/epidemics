@@ -4,9 +4,10 @@ Introduit la fonction to_sirs, pouvant prendre un certain temps à s'éxecuter. 
 
 import sys
 import time
+import random
 import networkx as nx
 import numpy as np
-from epidemics.sirs import Sirs
+from neo4j.v1 import GraphDatabase
 from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
 
@@ -31,33 +32,56 @@ def depl_matrix(secteurs, heure):
 
     return acc
 
-def to_sirs(m):
-    ''' Convertit une matrice de déplacements en un modèle SIR figé
+class NeoSirs:
+    ''' Convertit une matrice de déplacements en un modèle SIRS figé
+    !!! Requiert un serveur neo4j correctement configuré '''
 
-    m (np.array): la matrice des déplacements
+    def __init__(self, m, uri="bolt://localhost:7687"):
+        ''' m (np.array): la matrice des déplacements '''
 
-    retourne: s (epidemics.Sirs) le modèle SIRS obtenu '''
+        self.driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
 
-    g = nx.DiGraph()
-    g.add_nodes_from(MAP[:-2])
+        with self.driver.session() as ses:
+            # On vide la BDD
+            ses.run("MATCH (n) DETACH DELETE n")
 
-    for i, a in enumerate(m):
-        for j, b in enumerate(a):
-            # i correspond au secteur d'arrivée (ligne)
-            # j correspond au secteur de départ (colonne)
-            if i != j and b != 0:
-                # On augmente arbitrairement la proba
-                # A revoir plus tard
-                g.add_edge(MAP[i], MAP[j], p=b*97)
-    return Sirs(graph=g)
+            for i in range(98):
+                ses.run("CREATE (p:Personne {id: {i}, state: 0, age: 0})", {"i": i})
 
-sect = [Secteur(i) for i in MAP]
-for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
+            for i, a in enumerate(m):
+                for j, b in enumerate(a):
+                # i correspond au secteur d'arrivée (ligne)
+                # j correspond au secteur de départ (colonne)
+                    if i != j and b != 0:
+                        # On augmente arbitrairement la proba
+                        # A revoir plus tard
+                        ses.run("MATCH (p:Personne {id: {i}}),(q:Personne {id:{j}})"
+                                "CREATE (p)-[r:Lien {p: {k}}]->(q)",
+                                {"i": i, "j": j, "k": 97*b})
+
+            # Infection du patient zero
+            z = random.randint(0, 97)
+            ses.run("MATCH (p:Personne {id: {z}}) SET p.state = 1", {"z": z})
+
+            #TESTETSTETSTET
+            ses.run("Match (p:Personne), (q:Personne) WHERE id(p) < id(q) CREATE (p)-[r:Lien {p: 0.01}]->(q)")
+
+    def step(self, turns=1):
+        ''' Avancer de turns tours '''
+
+        with self.driver.session() as ses:
+            for n in ses.run("MATCH (p:Personne {state: 1})-[r:Lien]->(q) RETURN q, r.p").records():
+                if n['q']['state'] == 0 and random.random() < n['r.p']:
+                    ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 1", {"i": n['q']['id']})
+
+        if turns > 1:
+            self.step(turns-1)
+
+sect = [Secteur(i) for i in MAP[:1]]
+for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00' and t == 1000]:
     c = depl_matrix(sect, k)
-    s = to_sirs(c)
-    s.p = 0.9
-    s.increment_avg(100, 300)
-    s.plot()
+    s = NeoSirs(c)
+    s.step()
 
 # Heures produisant un résulat non nul (p=0.9):
 # 400 = oscillations amorties

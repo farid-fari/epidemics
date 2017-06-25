@@ -73,7 +73,7 @@ class Secteur:
         conn = sq.connect(_PATH)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT cle FROM Personnes WHERE secteur = ?", (secteur,))
+        cursor.execute("SELECT cle FROM Personnes WHERE secteur = ? LIMIT 20", (secteur,))
         self.code = secteur
         self.keys = [p[0] for p in cursor.fetchall()]
         if lazy:
