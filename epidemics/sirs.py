@@ -59,8 +59,8 @@ class Sirs:
         z['state'] = 1
 
         self.d = d
-        # On ne garde qu'une proba moyenne
-        self.p = np.mean([e[2]['p'] for e in self.graph.edges(data=True)])
+        # On ne garde qu'une proba moyenne, avec deux chiffres
+        self.p = round(np.mean([e[2]['p'] for e in self.graph.edges(data=True)]), 2)
         self.updatemod()
 
     def updatemod(self):
@@ -70,7 +70,7 @@ class Sirs:
             self.mod = "SIRS"
         if self.d[1] >= self.turn:
             self.mod = "SIR"
-        self.p = np.mean([e[2]['p'] for e in self.graph.edges(data=True)])
+        self.p = round(np.mean([e[2]['p'] for e in self.graph.edges(data=True)]), 2)
 
     def plot(self):
         '''Trace l'état actuel avec évolution, portrait de phase, ...'''

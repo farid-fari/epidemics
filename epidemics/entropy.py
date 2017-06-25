@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sirs import Sirs
 
 s = Sirs()
-s.increment_avg(200, 1000)
+s.increment_avg(200, 2000)
 # Valeur théorique de l'entropie du système
 y = [log(binom(s.n, i)) for i in s.infected]
 plt.figure(num=2)
