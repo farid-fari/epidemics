@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 '''Construit la matrice de transition d'un état à un autre.
 
 Introduit la fonction passage pour calculer cette matrice.'''

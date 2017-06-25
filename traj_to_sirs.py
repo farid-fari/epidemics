@@ -1,12 +1,11 @@
-''' Permet de convertir les données de trajectométrie en un modèle SIR.
+# -*- coding: UTF-8 -*-
+''' Se sert de LemonGraph pour gerer les graphes. '''
 
-Introduit la fonction to_sirs, pouvant prendre un certain temps à s'éxecuter. '''
-
-import sys
+import os
+import random
 import time
-import networkx as nx
 import numpy as np
-from epidemics.sirs import Sirs
+import LemonGraph as lg
 from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
 
@@ -21,58 +20,52 @@ def depl_matrix(secteurs, heure):
     acc = np.zeros((98, 98))
     for i, j in enumerate(secteurs):
         t = time.time()
-        print(f'{j.code} - {heure}', end='')
-        sys.stdout.flush()
+        print str(j.code) + ' - ' + str(heure)
         m, _ = passage(MAP[i], heure, memo=j)
         acc += m
-        print(f' -  {round(time.time()-t, 1)}s')
+        print ' -  ' + str(round(time.time()-t, 1)) +  's'
 
     acc /= len(secteurs)
 
     return acc
 
-def to_sirs(m):
-    ''' Convertit une matrice de déplacements en un modèle SIR figé
+class Sirs:
+    ''' Modele SIRS avec LG. '''
 
-    m (np.array): la matrice des déplacements
+    def __init__(self, dbpath, m):
+        ''' m (np.array): la matrice des déplacements
+            dbpath (str): l'endroit ou va la BDD '''
+        if os.path.exists(dbpath):
+            # Pour etre plus efficace
+            os.unlink(dbpath)
+        self.g = lg.Graph(dbpath)
+        with self.g.transaction(write=True) as txn:
+            self.nodes = []
+            for i in range(0, 98):
+                self.nodes.append(txn.node(type='sect', value=MAP[i]))
+                self.nodes[-1]['state'] = 0
+            for i, a in enumerate(m):
+                for j, b in enumerate(a):
+                    # i correspond au secteur d'arrivée (ligne)
+                    # j correspond au secteur de départ (colonne)
+                    if i != j and b != 0:
+                        # On augmente arbitrairement la proba
+                        # A revoir plus tard
+                        txn.edge(src=self.nodes[i], tgt=self.nodes[j], value=97*b)
+        # Patient zero
+        z = random.choice(self.nodes)
+        z['state'] = 1
 
-    retourne: s (epidemics.Sirs) le modèle SIRS obtenu '''
+    def step(self, i=1):
+        with self.g.transaction(write=False) as txn:
+            for e in txn.query('n(state=1)->e()->n()'):
+                print e
+        if i > 1:
+            step(i-1)
 
-    g = nx.DiGraph()
-    g.add_nodes_from(MAP[:-2])
+sect = [Secteur(i) for i in MAP[:1]]
 
-    for i, a in enumerate(m):
-        for j, b in enumerate(a):
-            # i correspond au secteur d'arrivée (ligne)
-            # j correspond au secteur de départ (colonne)
-            if i != j and b != 0:
-                # On augmente arbitrairement la proba
-                # A revoir plus tard
-                g.add_edge(MAP[i], MAP[j], p=b*97)
-    return Sirs(graph=g)
-
-sect = [Secteur(i) for i in MAP]
 for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
     c = depl_matrix(sect, k)
-    s = to_sirs(c)
-    s.p = 0.9
-    s.increment_avg(100, 300)
-    s.plot()
-
-# Heures produisant un résulat non nul (p=0.9):
-# 400 = oscillations amorties
-# 700 = oscillations infinies!!
-# 800 - oscillations intenses et amorties
-# 900 - idem
-# 1000 - idem mais non amorti
-# 1100 - oscilations peu itenses!!!
-# 1200 - oscillations trees tres tres intenses!!
-# 1300 - moyennement intense, amorti
-# 1400 - comme 1200
-# 1500 - comme 1300
-# 1600 - comme 1200
-# 1700 - comme 800
-# 1800 - comme 1200
-# 1900 - oscillations tres régulières
-# 2000 - idem
-# 2100 - oscillations s'amortiaant très régulièrement
+    s = Sirs('test' + str(k) +'.db', c)
+    s.step()

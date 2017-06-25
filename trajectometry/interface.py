@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 ''' Fournit des classes utiles à l'étude d'une table de données de trajectométrie.
 
 Définit la classe Person qui décrit une ligne de la base de données.'''
@@ -60,9 +61,6 @@ class Person:
             self.positions.append(h[0])
         # Je ne referme pas un curseur qui ne m'appartient pas
 
-    def __str__(self):
-        return f"id={self.cle}\nsecteur={self.secteur}"
-
 class Secteur:
     '''Charge et gère un secteur entier composé de Persons.'''
 
@@ -103,9 +101,6 @@ class Secteur:
         for i in self.keys:
             yield self.person(i)
         raise StopIteration
-
-    def __str__(self):
-        return f"code={self.code}\nnombre={self.nombre}"
 
 if __name__ == "__main__":
     c = sq.connect(_PATH)
