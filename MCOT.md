@@ -47,9 +47,9 @@ Comment modéliser la propagation d'une épidémie dans une région?
 
 L'étude générale de propagation sur tout graphe et toute infection étant trop compliqué, nous avons divisé le problème en deux optiques envisageables:
 
-- Comment **étouffer** une *épidémie donnée*, une fois lancée, en fonction du graphe et des trajectoires donnés? (identification de individus/secteurs à vacciner, à quarantiner, ...)
-- Comment **prévenir**, pour un *graphe et des trajectoires donnés*, la propagation d'un épidémie avant son incubation en fonction de ses caractéristiques? (identification de noeuds centraux, limites dans les moyens pouvant être déployés)
-- Quelles sont les **caractéristiques intéressantes** d'une épidémie dans un graphe donné?
+- Comment **freiner** une épidémie dans un réseau donné?
+- Etude stochastique au sein d'un noeud quelconque (chaines de Markov, ...)
+- Etude du modèle déterministe
 
 ## 5. Liste de réferences bibliographiques
 *(ébauche temporaire...)*
