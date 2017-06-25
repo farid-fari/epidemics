@@ -2,6 +2,9 @@
 .vscode/
 *.pyc
 tags
+neo4j/*
+*.db
+*.db-lock
 epidemics/.ipynb_checkpoints/
 epidemics/animate/
 trajectometry/trajecto.csv

@@ -48,31 +48,27 @@ def to_sirs(m):
             if i != j and b != 0:
                 # On augmente arbitrairement la proba
                 # A revoir plus tard
-                g.add_edge(MAP[i], MAP[j], p=b*97)
+                g.add_edge(MAP[i], MAP[j], p=97*b)
+                print(97*b)
+
     return Sirs(graph=g)
 
 sect = [Secteur(i) for i in MAP]
 for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
     c = depl_matrix(sect, k)
     s = to_sirs(c)
-    s.p = 0.9
     s.increment_avg(100, 300)
     s.plot()
 
-# Heures produisant un résulat non nul (p=0.9):
-# 400 = oscillations amorties
-# 700 = oscillations infinies!!
-# 800 - oscillations intenses et amorties
-# 900 - idem
-# 1000 - idem mais non amorti
-# 1100 - oscilations peu itenses!!!
-# 1200 - oscillations trees tres tres intenses!!
-# 1300 - moyennement intense, amorti
-# 1400 - comme 1200
-# 1500 - comme 1300
-# 1600 - comme 1200
-# 1700 - comme 800
-# 1800 - comme 1200
-# 1900 - oscillations tres régulières
-# 2000 - idem
-# 2100 - oscillations s'amortiaant très régulièrement
+# Heures produisant un résulat non nul (p=97*b):
+# 400: oscillations rapidement atténuées
+# 500: courbe decroissante stable
+# 1100: entretient constant
+# 1200: oscillations amorties
+# 1300: régime d'oscillations faibles
+# 1400: oscillations chaotiques
+# 1500: entretien constant
+# 1600: idem
+# 1700: oscillations intenses
+# 1800: idem
+# 1900: idem
