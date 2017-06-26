@@ -3,8 +3,9 @@
 *.pyc
 tags
 neo4j/*
+*.db
+*.db-lock
 epidemics/.ipynb_checkpoints/
 epidemics/animate/
 trajectometry/trajecto.csv
-trajectometry/trajecto.db
 trajectometry/.ipynb_checkpoints/

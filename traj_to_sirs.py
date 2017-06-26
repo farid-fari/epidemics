@@ -28,8 +28,6 @@ def depl_matrix(secteurs, heure):
         acc += m
         print(f' -  {round(time.time()-t, 1)}s')
 
-    acc /= len(secteurs)
-
     return acc
 
 class NeoSirs:
@@ -57,7 +55,7 @@ class NeoSirs:
                         # A revoir plus tard
                         ses.run("MATCH (p:Personne {id: {i}}),(q:Personne {id:{j}})"
                                 "CREATE (p)-[r:Lien {p: {k}}]->(q)",
-                                {"i": i, "j": j, "k": 97*b})
+                                {"i": i, "j": j, "k": b})
 
             # Infection du patient zero
             z = random.randint(0, 97)
@@ -65,24 +63,46 @@ class NeoSirs:
 
             #TESTETSTETSTET
             ses.run("Match (p:Personne), (q:Personne)"
-                    "WHERE id(p) < id(q) CREATE (p)-[r:Lien {p: 0.01}]->(q)")
+                    "WHERE id(p) < id(q) CREATE (p)-[r:Lien {p: 0.1}]->(q)")
         self.d = d
+        self.turn = 0
+        self.infected, self.removed = [], []
 
     def step(self, turns=1):
         ''' Avancer de turns tours '''
+
+        c, r = 0, 0
 
         with self.driver.session() as ses:
             for n in ses.run("MATCH (p:Personne)-[r:Lien]->(q) "
                              "WHERE p.state > 0 "
                              "RETURN p, q, r.p").records():
-                if n['p']['age'] < self.d[0]:
-                    if n['q']['state'] == 0 and random.random() < n['r.p']:
-                        ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 1",
-                                {"i": n['q']['id']})
-                        ses.run("MATCH (p:Personne {id: {i}}), (q:Personne {id: {j}}) "
-                                "CREATE (p)-[:Infection]->(q)",
-                                {"i": n['p']['id'], "j": n["q"]["id"]})
+                if n['p']['state'] == 1:
+                    if n['p']['age'] < self.d[0]:
+                        if n['q']['state'] == 0 and random.random() < n['r.p']:
+                            ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 1",
+                                    {"i": n['q']['id']})
+                            ses.run("MATCH (p:Personne {id: {i}}), (q:Personne {id: {j}}) "
+                                    "CREATE (p)-[:Infection]->(q)",
+                                    {"i": n['p']['id'], "j": n["q"]["id"]})
+                            ses.run("MATCH (p:Personne {id: {i}}) SET p.age = {p}",
+                                    {"i": n['p']['id'], "p": n['p']['age']+1})
+                            c += 1
+                    else:
+                        ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 2 AND p.age = 0",
+                                {"i": n['p']['id']})
+                        r += 1
+                else:
+                    # state = 2
+                    if n['p']['age'] < self.d[1]:
+                        ses.run("MATCH (p:Personne {id: {i}}) SET p.age = {p}",
+                                {"i": n['p']['id'], "p": n['p']['age']+1})
 
+                    else:
+                        ses.run("MATCH (p:Personne {id: {i}}) SET p.state = 2 AND p.age = 0",
+                                {"i": n['p']['id']})
+
+        self.turn += 1
         if turns > 1:
             self.step(turns-1)
 
@@ -90,22 +110,4 @@ sect = [Secteur(i) for i in MAP[:1]]
 for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00' and t == 1000]:
     c = depl_matrix(sect, k)
     s = NeoSirs(c)
-    s.step()
-
-# Heures produisant un résulat non nul (p=0.9):
-# 400 = oscillations amorties
-# 700 = oscillations infinies!!
-# 800 - oscillations intenses et amorties
-# 900 - idem
-# 1000 - idem mais non amorti
-# 1100 - oscilations peu itenses!!!
-# 1200 - oscillations trees tres tres intenses!!
-# 1300 - moyennement intense, amorti
-# 1400 - comme 1200
-# 1500 - comme 1300
-# 1600 - comme 1200
-# 1700 - comme 800
-# 1800 - comme 1200
-# 1900 - oscillations tres régulières
-# 2000 - idem
-# 2100 - oscillations s'amortiaant très régulièrement
+    s.step(20)
