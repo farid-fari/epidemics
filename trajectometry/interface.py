@@ -60,18 +60,19 @@ class Person:
     def __str__(self):
         return f"id={self.cle}\nsecteur={self.secteur}"
 
-class Secteur:
-    '''Charge et gère un secteur entier composé de Persons.'''
+class Groupe:
+    ''' Charge et gère un groupe de personnes arbitraire '''
 
-    def __init__(self, secteur, lazy=True):
-        '''secteur (int): le numéro de secteur à indexer
-           lazy (bool): s'il faut charger les personnes plus tard'''
+    def __init__(self, restclause="", limit=17000, lazy=True):
+        ''' restclause (string): la clause SQL de restriction,
+                sera insérée après le SELECT .. FROM ...
+            limit (int): le nombre maximal de personnes à charger
+            lazy (bool): s'il faut charger les personnes plus tard '''
 
         conn = sq.connect(_PATH)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT cle FROM Personnes WHERE secteur = ?", (secteur,))
-        self.code = secteur
+        cursor.execute(f"SELECT cle FROM Personnes {restclause} LIMIT ?", (limit,))
         self.keys = [p[0] for p in cursor.fetchall()]
         if lazy:
             # Algorithme flemmard: on ne charge que les clés
@@ -103,6 +104,15 @@ class Secteur:
 
     def __str__(self):
         return f"code={self.code}\nnombre={self.nombre}"
+
+class Secteur(Groupe):
+    ''' Le groupe est l'ensemble des habitants d'un secteur '''
+
+    def __init__(self, secteur, lazy=True):
+        '''secteur (int): le numéro de secteur à indexer
+           lazy (bool): s'il faut charger les personnes plus tard'''
+        Groupe.__init__(self, restclause=f"WHERE secteur={secteur}", lazy=lazy)
+        self.code = secteur
 
 if __name__ == "__main__":
     c = sq.connect(_PATH)

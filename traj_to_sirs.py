@@ -60,7 +60,8 @@ def to_sirs(m, prev=None):
 sect = [Secteur(i) for i in MAP]
 s = None
 
-for day in range(10):
+for day in range(5):
+    # Seulement les heures piles
     for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
         print(f'{day}-- {str(k).zfill(4)[:2]} --')
         c = depl_matrix(sect, k)
