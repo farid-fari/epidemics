@@ -1,7 +1,7 @@
-''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS.
+''' Permet la création de modèles SIRS dynamiques ou non.
 
-Introduit la fonction plot pour tracer un réseau SIRS, mais aussi SIR ou SIS avec
-des paramètres bien choisis. '''
+Introduit la classe Sirs, permettant de créer des modèles SIRS, mais aussi
+SIR et SIS. '''
 
 import copy
 import random as rand
@@ -54,29 +54,38 @@ class Sirs:
 
         self.infected = [1]
         self.removed = [0]
+        self.d = d
+
         # On infecte un patient zero
         _, z = rand.choice(list(self.graph.node.items()))
         z['state'] = 1
 
-        self.d = d
-        # On ne garde qu'une proba moyenne, avec deux chiffres
-        if self.graph.number_of_edges() > 0:
-            self.p = round(np.mean([e[2]['p'] for e in self.graph.edges(data=True)]), 2)
-        else:
-            self.p = 0
+        # Seront mis à jour dans updatemod()
+        self.p = 0
+        self.r0 = 0
+
         self.updatemod()
 
     def updatemod(self):
-        ''' Met à jour le modèle. '''
+        ''' Met à jour certaines propriétés de la classe '''
         self.mod = "SIS"
         if self.d[1]:
             self.mod = "SIRS"
         if self.d[1] >= self.turn:
             self.mod = "SIR"
+
+        # On ne garde qu'une proba moyenne, avec deux chiffres
         if self.graph.number_of_edges() > 0:
             self.p = round(np.mean([e[2]['p'] for e in self.graph.edges(data=True)]), 2)
+            # Calcul de <k> et <k^2> (inutile de faire la division par n)
+            a, b = 0, 0
+            for k in self.graph.degree():
+                a += k[1]
+                b += k[1]**2
+            self.r0 = self.p * (b/a - 1)
         else:
             self.p = 0
+            self.r0 = 0
 
     def plot(self):
         '''Trace l'état actuel avec évolution, portrait de phase, ...'''

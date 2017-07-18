@@ -6,6 +6,7 @@ import sys
 import time
 import networkx as nx
 import numpy as np
+import matplotlib.pyplot as plt
 from epidemics.sirs import Sirs
 from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
@@ -55,22 +56,28 @@ def to_sirs(m, prev=None):
     if prev:
         prev.graph = g
         return prev
-    return Sirs(d=[8, 3], graph=g)
+    return Sirs(d=[4, 2], graph=g)
 
 sect = [Secteur(i) for i in MAP]
 s = None
+x, y = [], []
 
-for day in range(5):
+for day in range(1):
     # Seulement les heures piles
-    for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
+    for k in [t for t in TIMES]:
         print(f'{day}-- {str(k).zfill(4)[:2]} --')
         c = depl_matrix(sect, k)
         s = to_sirs(c, prev=s)
         s.increment(2)
+        s.updatemod()
+        x.append(s.turn)
+        y.append(s.r0)
 
 s.plot()
+plt.plot(x, y)
+plt.show()
 
-# Heures produisant un résulat non nul (p=97*b):
+# Heures produisant un résulat non nul (p=b):
 # 400: oscillations rapidement atténuées
 # 500: courbe decroissante stable
 # 1100: entretient constant
