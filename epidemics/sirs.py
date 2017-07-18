@@ -78,8 +78,12 @@ class Sirs:
         if self.graph.number_of_edges() > 0:
             self.p = round(np.mean([e[2]['p'] for e in self.graph.edges(data=True)]), 2)
             # Calcul de <k> et <k^2> (inutile de faire la division par n)
+            g = copy.deepcopy(self.graph)
+            for e in [t for t in g.edges(data=True)]:
+                if e[2]['p'] == 0:
+                    g.remove_edge(e[0], e[1])
             a, b = 0, 0
-            for k in self.graph.degree():
+            for k in g.degree():
                 a += k[1]
                 b += k[1]**2
             self.r0 = self.p * (b/a - 1)

@@ -20,17 +20,16 @@ def depl_matrix(secteurs, heure, verbose=False):
 
     retourne: acc (np.array) les déplacements durant l'heure donnée '''
 
-    acc = np.zeros((98, 98))
-    for i, j in enumerate(secteurs):
+    acc = np.zeros((97, 98))
+    for i, j in enumerate(secteurs[:-1]):
         if verbose:
             t = time.time()
             print(f'{j.code} - {heure}', end='')
             sys.stdout.flush()
-        m, _ = passage(MAP[i], heure, memo=j)
-        acc += m
+        _, (_, m) = passage(MAP[i], heure, memo=j)
+        acc[i] = m / sum(m)
         if verbose:
             print(f' -  {round(time.time()-t, 1)}s')
-
     return acc
 
 def to_sirs(m, prev=None):
@@ -64,7 +63,7 @@ x, y = [], []
 
 for day in range(1):
     # Seulement les heures piles
-    for k in [t for t in TIMES]:
+    for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
         print(f'{day}-- {str(k).zfill(4)[:2]} --')
         c = depl_matrix(sect, k)
         s = to_sirs(c, prev=s)
@@ -72,6 +71,7 @@ for day in range(1):
         s.updatemod()
         x.append(s.turn)
         y.append(s.r0)
+        print(s.p)
 
 s.plot()
 plt.plot(x, y)
