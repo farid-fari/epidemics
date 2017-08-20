@@ -81,25 +81,14 @@ for day in range(1):
         print(f'{day}j {str(k).zfill(4)[:2]}h -- R0≈', end=' ')
         c = depl_matrix(sect, k)
         s = to_sirs(c, prev=s)
+        # On simule deux tours par jour
         s.increment(2)
         s.updatemod()
-        x.append(s.turn)
+        x.append(day*2400+k)
         y.append(s.r0)
         print(s.r0)
 
 s.plot()
-plt.plot(x, y)
+plt.plot(x, y, 'g')
+plt.plot([0, max(x)], [1, 1], 'r')
 plt.show()
-
-# Heures produisant un résulat non nul (p=b):
-# 400: oscillations rapidement atténuées
-# 500: courbe decroissante stable
-# 1100: entretient constant
-# 1200: oscillations amorties
-# 1300: régime d'oscillations faibles
-# 1400: oscillations chaotiques
-# 1500: entretien constant
-# 1600: idem
-# 1700: oscillations intenses
-# 1800: idem
-# 1900: idem
