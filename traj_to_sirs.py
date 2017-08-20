@@ -4,6 +4,7 @@ Introduit la fonction to_sirs, pouvant prendre un certain temps à s'éxecuter. 
 
 import sys
 import time
+import random
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
@@ -68,27 +69,47 @@ def to_sirs(m, prev=None):
         return prev
     return Sirs(d=[4, 2], graph=g)
 
-t = time.time()
-print('Chargement des secteurs...', end='')
-sect = [Secteur(i) for i in MAP]
-print(f'{round(time.time()-t, 1)}s')
-s = None
-x, y = [], []
+def plotR0(grades=10):
+    ''' Permet de tracer différentes évolutions de R0 par journée
+    en fonction du nombre de connection supprimées.
 
-for day in range(1):
-    # Seulement les heures piles
-    for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
-        print(f'{day}j {str(k).zfill(4)[:2]}h -- R0≈', end=' ')
-        c = depl_matrix(sect, k)
-        s = to_sirs(c, prev=s)
-        # On simule deux tours par jour
-        s.increment(2)
-        s.updatemod()
-        x.append(day*2400+k)
-        y.append(s.r0)
-        print(s.r0)
+    grades (int): le nombre de proportions à tester entre 0 et 1. En mettre au
+        moins deux, sinon inutile. '''
 
-s.plot()
-plt.plot(x, y, 'g')
-plt.plot([0, max(x)], [1, 1], 'r')
-plt.show()
+    t = time.time()
+    print('Chargement des secteurs...', end='')
+    sect = [Secteur(i) for i in MAP]
+    print(f'{round(time.time()-t, 1)}s')
+
+    for prop in [i/(grades - 1) for i in range(grades)]:
+        # Va nous permettre de retenir le modèle SIRS entre les tours de
+        # la simulation
+        s = None
+        x, y = [], []
+
+        # Seulement les heures piles
+        for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
+            print(f'{round(prop,3)} -- {str(k).zfill(4)[:2]}h -- R0≈', end=' ')
+            c = depl_matrix(sect, k)
+            s = to_sirs(c, prev=s)
+
+            # On choisit les secteurs qu'on va déconnecter
+            shufedge = list(s.graph.edges())
+            random.shuffle(shufedge)
+
+            for edg in shufedge[:int(prop*len(shufedge))]:
+                s.graph.remove_edge(edg[0], edg[1])
+
+            # On reste au tour 0 et on ne simule rien, c'est ici inutile
+            s.updatemod()
+            x.append(k)
+            y.append(s.r0)
+            print(s.r0)
+
+        plt.plot(x, y)
+
+    plt.plot([0, max(x)], [1, 1], 'r')
+    plt.show()
+
+if __name__ == "__main__":
+    plotR0()
