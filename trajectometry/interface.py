@@ -23,7 +23,7 @@ TIMES = [0, 15, 30, 45, 100, 115, 130, 145, 200, 215, 230, 245, 300, 315, 330, 3
          2300, 2315, 2330, 2345]
 
 # Utilise un chemin absolu pour retrouver la BDD
-_PATH = os.path.join(os.path.dirname(__file__), 'trajecto.db')
+_PATH = os.path.join(os.path.dirname(__file__), 'trajecto_other.db')
 
 class Person:
     ''' Crée un objet Person facilement manipulable en lisant la base de données
@@ -53,28 +53,26 @@ class Person:
         self.redressement = float(data[3])
         self.occupation = int(data[4])
 
-        self.positions = []
         # On récupére les 96 horaires et positions associées dans l'ordre
-        for h in cursor.execute("SELECT endroit FROM Positions WHERE cle=? ORDER BY"
-                                " heure ASC LIMIT 100", (self.cle,)):
-            self.positions.append(h[0])
+        self.positions = data[5:]
         # Je ne referme pas un curseur qui ne m'appartient pas
 
     def __str__(self):
         return f"id={self.cle}\nsecteur={self.secteur}"
 
-class Secteur:
-    '''Charge et gère un secteur entier composé de Persons.'''
+class Groupe:
+    ''' Charge et gère un groupe de personnes arbitraire '''
 
-    def __init__(self, secteur, lazy=True):
-        '''secteur (int): le numéro de secteur à indexer
-           lazy (bool): s'il faut charger les personnes plus tard'''
+    def __init__(self, restclause="", limit=17000, lazy=True):
+        ''' restclause (string): la clause SQL de restriction,
+                sera insérée après le SELECT .. FROM ...
+            limit (int): le nombre maximal de personnes à charger
+            lazy (bool): s'il faut charger les personnes plus tard '''
 
         conn = sq.connect(_PATH)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT cle FROM Personnes WHERE secteur = ?", (secteur,))
-        self.code = secteur
+        cursor.execute(f"SELECT cle FROM Personnes {restclause} LIMIT ?", (limit,))
         self.keys = [p[0] for p in cursor.fetchall()]
         if lazy:
             # Algorithme flemmard: on ne charge que les clés
@@ -106,6 +104,15 @@ class Secteur:
 
     def __str__(self):
         return f"code={self.code}\nnombre={self.nombre}"
+
+class Secteur(Groupe):
+    ''' Le groupe est l'ensemble des habitants d'un secteur '''
+
+    def __init__(self, secteur, lazy=True):
+        '''secteur (int): le numéro de secteur à indexer
+           lazy (bool): s'il faut charger les personnes plus tard'''
+        Groupe.__init__(self, restclause=f"WHERE secteur={secteur}", lazy=lazy)
+        self.code = secteur
 
 if __name__ == "__main__":
     c = sq.connect(_PATH)

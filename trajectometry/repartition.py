@@ -6,7 +6,10 @@ import seaborn as sb
 import numpy as np
 import matplotlib as mtpl
 import matplotlib.pyplot as plt
-from .interface import Secteur, MAP, TIMES
+if __name__ == "__main__":
+    from interface import Secteur, MAP, TIMES
+else:
+    from .interface import Secteur, MAP, TIMES
 
 def plot(secteur):
     # Permet d'avoir des étiquettes raisonnables dans le graphe final
@@ -43,11 +46,14 @@ def plot(secteur):
     sb.heatmap(np.ma.filled(data, 0), xticklabels=times_labels, yticklabels=map_labels,
                mask=data.mask, cmap=mtpl.cm.get_cmap(name="YlOrRd"))
     plt.yticks(rotation=0)
+    plt.ylabel('Heure')
+    plt.xlabel('Secteur')
 
     with sb.axes_style('darkgrid'):
         plt.subplot(1, 2, 2)
 
     plt.title(f"Proportion de la population du secteur {secteur} présente dans son secteur")
+    plt.xlabel('Heure')
     plt.plot(TIMES, data.data[MAP.index(secteur)])
 
     plt.show()

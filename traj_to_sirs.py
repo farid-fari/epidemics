@@ -6,77 +6,89 @@ import sys
 import time
 import networkx as nx
 import numpy as np
+import matplotlib.pyplot as plt
 from epidemics.sirs import Sirs
 from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
 
-def depl_matrix(secteurs, heure):
-    ''' Convertit les données de trajectométrie en modèle SIRS.
+def depl_matrix(secteurs, heure, verbose=False):
+    ''' Donne une matrice de probabilité de présence d'un individu d'un secteur
+    dans un autre. M[i][j]: proba qu'un individu de i soit au secteur j à l'heure.
 
     secteurs (Secteur list): la liste des secteurs préchargés
-    heure (int): l'heure à laquelle on veut faire le modèle
+    heure (int): l'heure à laquelle on veut calculer la matrice
+    verbose (bool): s'il faut faire du bruit
 
-    retourne: acc (np.array) les déplacements durant l'heure donnée '''
+    retourne: n (np.array) la matrice spécifiée '''
 
-    acc = np.zeros((98, 98))
-    for i, j in enumerate(secteurs):
-        t = time.time()
-        print(f'{j.code} - {heure}', end='')
-        sys.stdout.flush()
-        m, _ = passage(MAP[i], heure, memo=j)
-        acc += m
-        print(f' -  {round(time.time()-t, 1)}s')
+    acc = np.zeros((97, 98))
+    for i, j in enumerate(secteurs[:-1]):
+        if verbose:
+            t = time.time()
+            print(f'{j.code} - {heure}', end='')
+            sys.stdout.flush()
 
-    acc /= len(secteurs)
+        # La proba correspond aux positions des gens à l'heure, le tout
+        # divisé par le nombre de personnes
+        _, (_, m) = passage(MAP[i], heure, memo=j)
+        acc[i] = m / sum(m)
 
-    # Déboggage éventuel
-    # for i in range(98):
-    #     for j in range(98):
-    #         if acc[i][j]:
-    #             print((i, j), acc[i][j])
-
+        if verbose:
+            print(f' -  {round(time.time()-t, 1)}s')
     return acc
 
-def to_sirs(m):
+def to_sirs(m, prev=None):
     ''' Convertit une matrice de déplacements en un modèle SIR figé
 
     m (np.array): la matrice des déplacements
+    prev (Sirs): un éventuel modèle à mettre à jour
 
     retourne: s (epidemics.Sirs) le modèle SIRS obtenu '''
 
-    g = nx.DiGraph()
-    g.add_nodes_from(MAP[:-2])
+    if prev is None:
+        g = nx.DiGraph()
+        g.add_nodes_from(MAP)
+    else:
+        g = prev.graph
 
     for i, a in enumerate(m):
         for j, b in enumerate(a):
             # i correspond au secteur d'arrivée (ligne)
             # j correspond au secteur de départ (colonne)
-            if i != j and b != 0:
-                g.add_edge(MAP[i], MAP[j])
-    return Sirs(graph=g)
+            if i != j:
+                # On chosira en fonction:
+                #   - p=1 pour avoir un modèle simple (ajouter une condition avec b)
+                #   - p=b(*λ) pour avoir un modèle plus réaliste
+                if b:
+                    g.add_edge(MAP[i], MAP[j], p=1)
+                else:
+                    g.add_edge(MAP[i], MAP[j], p=0)
+    if prev:
+        prev.graph = g
+        return prev
+    return Sirs(d=[4, 2], graph=g)
 
+t = time.time()
+print('Chargement des secteurs...', end='')
 sect = [Secteur(i) for i in MAP]
-for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
-    c = depl_matrix(sect, k)
-    s = to_sirs(c)
-    s.p = 0.9
-    s.increment_avg(100, 300)
-    s.plot()
+print(f'{round(time.time()-t, 1)}s')
+s = None
+x, y = [], []
 
-# Heures produisant un résulat non nul (p=0.9):
-# 400 = oscillations amorties
-# 700 = oscillations infinies!!
-# 800 - oscillations intenses et amorties
-# 900 - idem
-# 1000 - idem mais non amorti
-# 1100 - oscilations peu itenses!!!
-# 1200 - oscillations trees tres tres intenses!!
-# 1300 - moyennement intense, amorti
-# 1400 - comme 1200
-# 1500 - comme 1300
-# 1600 - comme 1200
-# 1700 - comme 800
-# 1800 - comme 1200
-# 1900 - oscillations tres régulières
-# 2000 - idem
-# 2100 - oscillations s'amortiaant très régulièrement
+for day in range(1):
+    # Seulement les heures piles
+    for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
+        print(f'{day}j {str(k).zfill(4)[:2]}h -- R0≈', end=' ')
+        c = depl_matrix(sect, k)
+        s = to_sirs(c, prev=s)
+        # On simule deux tours par jour
+        s.increment(2)
+        s.updatemod()
+        x.append(day*2400+k)
+        y.append(s.r0)
+        print(s.r0)
+
+s.plot()
+plt.plot(x, y, 'g')
+plt.plot([0, max(x)], [1, 1], 'r')
+plt.show()

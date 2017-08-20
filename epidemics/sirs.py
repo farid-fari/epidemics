@@ -1,7 +1,7 @@
-''' Illustre les oscillations possibles dans certains réseaux avec le modèle SIRS.
+''' Permet la création de modèles SIRS dynamiques ou non.
 
-Introduit la fonction plot pour tracer un réseau SIRS, mais aussi SIR ou SIS avec
-des paramètres bien choisis. '''
+Introduit la classe Sirs, permettant de créer des modèles SIRS, mais aussi
+SIR et SIS. '''
 
 import copy
 import random as rand
@@ -42,31 +42,58 @@ class Sirs:
             node[1]['age'] = 0
             node[1]['infections'] = 0
         for edge in self.graph.edges(data=True):
-            # color = 0 neutre, 1 tentative d'infection, 2 infection transmise
-            edge[2]['color'] = 0
+            if not 'p' in edge[2]:
+                # Aucune proba d'infection spécifiée ici
+                edge[2]['p'] = p
+
+            # color = 0 -> .5 neutre, 1 tentative d'infection, 2 infection transmise
+            edge[2]['color'] = edge[2]['p'] / 2
             # sert dans l'affichage en ressorts
             # vector = 0.01 simple connection, 0.05 si essai de transmission, 1 sinon
             edge[2]['vector'] = 0.01
 
         self.infected = [1]
         self.removed = [0]
+        self.d = d
+
         # On infecte un patient zero
         _, z = rand.choice(list(self.graph.node.items()))
         z['state'] = 1
-        #self.graph.node[rand.randint(0, self.n - 1)]['state'] = 1
 
-        self.d = d
-        self.p = p
-        self.mod = "SIS"
+        # Seront mis à jour dans updatemod()
+        self.p = 0
+        self.r0 = 0
+
         self.updatemod()
 
     def updatemod(self):
-        ''' Met à jour le nom de modèle. '''
+        ''' Met à jour certaines propriétés de la classe '''
         self.mod = "SIS"
         if self.d[1]:
             self.mod = "SIRS"
         if self.d[1] >= self.turn:
             self.mod = "SIR"
+
+        # Calculs inutiles si on n'a pas de connections
+        if self.graph.number_of_edges() > 0:
+            # deepcopy: évite de toucher à notre graphe actuel, permettant
+            # de supprimer les cotés où p=0 (non comptés dans <k> et <k²>)
+            g = copy.deepcopy(self.graph)
+            # calcul de p: utilisation de numpy mean pour précision (arrondissements)
+            self.p = np.mean([e[2]['p'] for e in g.edges(data=True)])
+            # Calcul de <k> et <k^2> (inutile de faire la division par n)
+            for e in [t for t in g.edges(data=True)]:
+                if e[2]['p'] == 0:
+                    g.remove_edge(e[0], e[1])
+            a, b = 0, 0
+            # Nous donne les couples (noeud, k)
+            for k in g.degree():
+                a += k[1]
+                b += k[1]**2
+            self.r0 = self.p * (b/a - 1)
+        else:
+            self.p = 0
+            self.r0 = 0
 
     def plot(self):
         '''Trace l'état actuel avec évolution, portrait de phase, ...'''
@@ -147,63 +174,65 @@ class Sirs:
     def increment(self, turns=1):
         ''' Simule n tours de l'épidémie.
             turns (int): nombre de tours à simuler '''
-        for _ in range(turns):
-            # Afin d'éviter de faire une boucle de comptage,
-            # on compte les infectés et retirés au fur et à mesure
-            counter = 0
-            remcounter = 0
-            # Evite de traiter des patient infectés dès ce tour-ci
-            for node in [k for k in self.graph.nodes(data=True) if k[1]['state'] >= 1]:
-                # On ne s'interesse qu'aux patients infectés
-                if node[1]['state'] == 1:
-                    counter += 1
-                    if node[1]['age'] < self.d[0]:
-                        node[1]['age'] += 1
-                        for other in self.graph[node[0]]:
-                            # Si l'autre est dans l'état S
-                            if not self.graph.node[other]['state']:
-                                if rand.random() < self.p:
-                                    # On met les stats au mode infecté
-                                    self.graph.node[other]['state'] = 1
-                                    self.graph.node[other]['age'] = 0 # par sureté (non nécessaire)
-                                    self.graph.node[other]['infections'] += 1
+        # Afin d'éviter de faire une boucle de comptage,
+        # on compte les infectés et retirés au fur et à mesure
+        counter = 0
+        remcounter = 0
+        # Evite de traiter des patient infectés dès ce tour-ci
+        for node in [k for k in self.graph.nodes(data=True) if k[1]['state'] >= 1]:
+            if node[1]['state'] == 1:
+                # On s'interesse d'abord aux patients infectés
+                counter += 1
+                if node[1]['age'] < self.d[0]:
+                    node[1]['age'] += 1
+                    for other in self.graph[node[0]]:
+                        # Si l'autre est dans l'état S
+                        if not self.graph.node[other]['state']:
+                            if rand.random() < self.graph.edge[node[0]][other]['p']:
+                                # On met les stats au mode infecté
+                                self.graph.node[other]['state'] = 1
+                                self.graph.node[other]['age'] = 0 # par sureté (non nécessaire)
+                                self.graph.node[other]['infections'] += 1
 
-                                    # De plus, on le compte
-                                    counter += 1
+                                # De plus, on le compte
+                                counter += 1
 
-                                    # Pour la coloration
-                                    self.graph.edge[node[0]][other]['color'] = 2
-                                    # Servira de ressort dans le graphe
-                                    self.graph.edge[node[0]][other]['vector'] = 1
-                                else:
-                                    self.graph.edge[node[0]][other]['color'] = 1
-                                    self.graph.edge[node[0]][other]['vector'] = 0.05
-                    else:
-                        # En fin de compte, il n'est pas infecté, mais retiré/susceptible
-                        counter -= 1
+                                # Pour la coloration
+                                self.graph.edge[node[0]][other]['color'] = 2
+                                # Servira de ressort dans le graphe
+                                self.graph.edge[node[0]][other]['vector'] = 1
+                            else:
+                                self.graph.edge[node[0]][other]['color'] = 1
+                                self.graph.edge[node[0]][other]['vector'] = 0.05
+                else:
+                    # En fin de compte, il n'est pas infecté, mais retiré/susceptible
+                    counter -= 1
 
-                        if self.d[1]:
-                            # Passage en mode retiré
-                            node[1]['state'] = 2
-                            node[1]['age'] = 0
-                            remcounter += 1
-                        else:
-                            # Passage en mode susceptible
-                            node[1]['state'] = 0
-                            node[1]['age'] = 0
-                elif node[1]['state'] == 2:
-                    if node[1]['age'] < self.d[1]:
-                        # On ne compte que celles qu'on ne va pas retirer
+                    if self.d[1]:
+                        # Passage en mode retiré
+                        node[1]['state'] = 2
+                        node[1]['age'] = 0
                         remcounter += 1
-                        node[1]['age'] += 1
                     else:
-                        # Remise à zero des statistiques
+                        # Passage en mode susceptible
                         node[1]['state'] = 0
                         node[1]['age'] = 0
-            # On enregistre succesivement les valeurs pour les tracer plus tard
-            self.infected.append(counter)
-            self.removed.append(remcounter)
-            self.turn += 1
+            elif node[1]['state'] == 2:
+                if node[1]['age'] < self.d[1]:
+                    # On ne compte que celles qu'on ne va pas retirer
+                    remcounter += 1
+                    node[1]['age'] += 1
+                else:
+                    # Remise à zero des statistiques
+                    node[1]['state'] = 0
+                    node[1]['age'] = 0
+        # On enregistre succesivement les valeurs pour les tracer plus tard
+        self.infected.append(counter)
+        self.removed.append(remcounter)
+        self.turn += 1
+
+        if turns > 1:
+            self.increment(turns=turns-1)
 
     def increment_avg(self, turns=50, sample=600):
         ''' Calcule l'évolution moyenne sur n tours à partir du tour actuel
@@ -244,5 +273,5 @@ class Sirs:
 
 if __name__ == "__main__":
     s = Sirs()
-    s.increment_avg(100, 1000)
+    s.increment_avg(100, 500)
     s.plot()

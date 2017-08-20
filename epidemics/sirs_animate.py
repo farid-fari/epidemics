@@ -48,7 +48,7 @@ def animate(n=60, d=[4, 2], p=0.05, turns=100, graph=0.3):
                        if model.graph.node[i]['state']])
         ya = np.array([x[1] for i, x in enumerate(list(pos.values()))
                        if model.graph.node[i]['state']])
-        # La heatmap a peu d'intéret et est peu stable pour peu de valeurs
+        # La heatmap (kdeplot) a peu d'intéret et est peu stable pour peu de valeurs
         if xa.size > 2:
             sb.kdeplot(xa, ya, shade=True, cmap="Purples", legend=False, shade_lowest=False)
 
