@@ -12,7 +12,7 @@ from trajectometry.interface import MAP, TIMES, Secteur
 from trajectometry.transition import passage
 
 def depl_matrix(secteurs, heure, verbose=False):
-    ''' Convertit les données de trajectométrie en modèle SIRS.
+    ''' Convertit les données de trajectométrie en matrice de déplacements.
 
     secteurs (Secteur list): la liste des secteurs préchargés
     heure (int): l'heure à laquelle on veut faire le modèle
@@ -64,7 +64,7 @@ x, y = [], []
 for day in range(1):
     # Seulement les heures piles
     for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
-        print(f'{day}-- {str(k).zfill(4)[:2]} --')
+        print(f'{day} -- {str(k).zfill(4)[:2]} --', end=' ')
         c = depl_matrix(sect, k)
         s = to_sirs(c, prev=s)
         s.increment(2)
