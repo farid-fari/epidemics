@@ -13,6 +13,7 @@ def passage(sect, tf, ti=None, memo=None, verbose=False):
 
     tf (int): le temps final
     tf (int): le temps initial
+        si non précisé, il s'agit de tf-1
     sect (int): le secteur en question
     memo (interface.Secteur): un secteur déjà chargé
     verbose (bool): si l'on doit afficher les temps chargés

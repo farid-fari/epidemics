@@ -76,11 +76,12 @@ class Sirs:
 
         # Calculs inutiles si on n'a pas de connections
         if self.graph.number_of_edges() > 0:
-            self.p = np.mean([e[2]['p'] for e in self.graph.edges(data=True)])
-            # Calcul de <k> et <k^2> (inutile de faire la division par n)
             # deepcopy: évite de toucher à notre graphe actuel, permettant
-            # supprimer les cotés où p=0 (non comptés dans <k> et <k²>)
+            # de supprimer les cotés où p=0 (non comptés dans <k> et <k²>)
             g = copy.deepcopy(self.graph)
+            # calcul de p: utilisation de numpy mean pour précision (arrondissements)
+            self.p = np.mean([e[2]['p'] for e in g.edges(data=True)])
+            # Calcul de <k> et <k^2> (inutile de faire la division par n)
             for e in [t for t in g.edges(data=True)]:
                 if e[2]['p'] == 0:
                     g.remove_edge(e[0], e[1])
