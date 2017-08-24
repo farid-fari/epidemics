@@ -125,4 +125,9 @@ def plotR0(grades=10):
     plt.show()
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     plotR0(50)
+=======
+    import cProfile
+    cProfile.run("plotR0(50)", 'stats')
+>>>>>>> 394d1ad1127fe2afb1bb677ceb68bd97b6cbe8b2
