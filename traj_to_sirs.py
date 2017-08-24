@@ -78,6 +78,7 @@ def plotR0(grades=10):
 
     t = time.time()
     print('Chargement des secteurs...', end='')
+    sys.stdout.flush()
     sect = [Secteur(i) for i in MAP]
     print(f'{round(time.time()-t, 1)}s')
 
@@ -88,17 +89,29 @@ def plotR0(grades=10):
         x, y = [], []
 
         # Seulement les heures piles
-        for k in [t for t in TIMES if (str(t).zfill(4))[-2:] == '00']:
-            print(f'{round(prop,3)} -- {str(k).zfill(4)[:2]}h -- R0≈', end=' ')
+        for k in [t for t in TIMES]:
+            # if (str(t).zfill(4))[-2:] == '00'
+            print(f'{round(prop,3)} -- {str(k).zfill(4)}h -- R0≈', end=' ')
             c = depl_matrix(sect, k)
             s = to_sirs(c, prev=s)
 
-            # On choisit les secteurs qu'on va déconnecter
-            shufedge = list(s.graph.edges())
-            random.shuffle(shufedge)
+            degr = np.zeros(98)
+            for e in s.graph.edges(data=True):
+                if e[2]['p']:
+                    degr[MAP.index(e[0])] += 1
+                    degr[MAP.index(e[1])] += 1
 
-            for edg in shufedge[:int(prop*len(shufedge))]:
-                s.graph.remove_edge(edg[0], edg[1])
+            edges = [[k, 0] for k in s.graph.edges()]
+            for e in edges:
+                e[1] += degr[MAP.index(e[0][0])] + degr[MAP.index(e[0][1])]
+
+            def cle(e):
+                return e[1]
+
+            edges.sort(key=cle, reverse=True)
+
+            for e in edges[:int(prop*len(edges))]:
+                s.graph.remove_edge(e[0][0], e[0][1])
 
             # On reste au tour 0 et on ne simule rien, c'est ici inutile
             s.updatemod()
@@ -106,10 +119,11 @@ def plotR0(grades=10):
             y.append(s.r0)
             print(s.r0)
 
-        plt.plot(x, y)
+        plt.plot(x, y, color=(1-prop, 150/255, 0))
 
     plt.plot([0, max(x)], [1, 1], 'r')
     plt.show()
 
 if __name__ == "__main__":
-    plotR0()
+    import cProfile
+    cProfile.run("plotR0(50)", 'stats')

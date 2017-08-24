@@ -90,7 +90,11 @@ class Sirs:
             for k in g.degree():
                 a += k[1]
                 b += k[1]**2
-            self.r0 = self.p * (b/a - 1)
+            if a:
+                self.r0 = self.p * (b/a - 1)
+            else:
+                # Pas de connections: R0 est nul
+                self.r0 = 0
         else:
             self.p = 0
             self.r0 = 0
