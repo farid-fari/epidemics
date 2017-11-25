@@ -25,12 +25,14 @@ La plupart des fichiers ne font que de définir des fonctions et classes. J'ai s
 
 Ce que je te conseille après avoir compris la structure, c'est de créer un fichier `thibault.py` dans le dossier de base et de programmer ce que tu veux avec. Pour ca, importer les fonctions qui t'intéressent en faisant:
 
-    from epidemics.sirs import Sirs
-    # par exemple, ou
-    from trajectometry.transition import passage
+```python
+from epidemics.sirs import Sirs
+# par exemple, ou
+from trajectometry.transition import passage
 
-    # generalement:
-    from dossier.fichier import fonctionOuClasse, fonctionOuClasse2, ..., fonctionOuClasseN
+# generalement:
+from dossier.fichier import fonctionOuClasse, fonctionOuClasse2, ..., fonctionOuClasseN
+```
 
 Enfin, la `MCOT` sur laquelle on avait travaillé est en format markdown sous le nom `MCOT.md` et en format LaTeX sous le nom `MCOT.tex`.
 
@@ -39,22 +41,23 @@ Enfin, la `MCOT` sur laquelle on avait travaillé est en format markdown sous le
 ## `epidemics\sirs.py`
 
 Contient la classe `Sirs` qui permet de simuler les modèles SIR, SIRS, SIS. Exemple d'utilisation-type:
+```python
+s = Sirs(n=60, d=[4, 2], p=0.05, graph=0.3)
+# Crée un réseau de 60 individus pris d'une maladie qui dure
+# 4 instants, rend immun 2 instants, avec une probabilité de
+# propagation de 0.05. La population est relié par un graphe
+# de densité 0.3
 
-    s = Sirs(n=60, d=[4, 2], p=0.05, graph=0.3)
-    # Crée un réseau de 60 individus pris d'une maladie qui dure
-    # 4 instants, rend immun 2 instants, avec une probabilité de
-    # propagation de 0.05. La population est relié par un graphe
-    # de densité 0.3
+s.plot()
+# Permet de représenter joliment le réseau
 
-    s.plot()
-    # Permet de représenter joliment le réseau
+s.increment(turns=5)
+# Fait avancer l'épidémie de 5 instants
 
-    s.increment(turns=5)
-    # Fait avancer l'épidémie de 5 instants
-
-    s.increment_avg(turns=50, sample=500)
-    # Effectue 500 simulations des 50 prochains tours, et affiche
-    # l'évolution moyenne
+s.increment_avg(turns=50, sample=500)
+# Effectue 500 simulations des 50 prochains tours, et affiche
+# l'évolution moyenne
+```
 
 Garantie de débloquer 3 points chez le jury si tu leur explique que c'est de la POO.
 
