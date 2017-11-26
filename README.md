@@ -30,7 +30,7 @@ Basé sur [Competitive Diffusion in Social Networks: Quality or Seeding?](https:
 
 # Dépendances
 
-Le code est écrit pour **Python 3.6.1** (au moins **3.6** pour les 'literal string'). Il est nécessaire d'installer les librairies `networkx`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
+Le code est écrit pour **Python 3.6.1** (au moins **3.6** pour les 'literal string'). Il est nécessaire d'installer les librairies `networkx==1.11`, `matplotlib`, `seaborn` et `numpy` afin de pouvoir éxecuter les scripts Python.
 
 La création d'animations requiert `ffmpeg` pour l'encodage automatique (facultatif) et `vlc` pour le visionnage automatique (aussi facultatif).
 

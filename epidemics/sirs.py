@@ -86,10 +86,10 @@ class Sirs:
                 if e[2]['p'] == 0:
                     g.remove_edge(e[0], e[1])
             a, b = 0, 0
-            # Nous donne les couples (noeud, k)
-            for k in g.degree():
-                a += k[1]
-                b += k[1]**2
+            # Nous donne le nombre de neouds ayant chaque degré
+            for k, n in enumerate(g.degree()):
+                a += n*k
+                b += n*k**2
             if a:
                 self.r0 = self.p * (b/a - 1)
             else:
